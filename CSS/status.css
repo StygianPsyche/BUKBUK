@@ -199,8 +199,13 @@ body {
   width: 95%;
   max-width: 280px;
   height: 130px;
+  display: flex;               /* use flexbox */
+  align-items: center;         /* vertical center */
+  justify-content: center;     /* horizontal center */
   transition: all 0.2s ease;
+  text-align: center;          /* fallback text center */
 }
+
 
 .keyboard-button:hover {
   transform: scale(1.05);
