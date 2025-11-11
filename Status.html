@@ -12,46 +12,52 @@
   <link rel="stylesheet" href="CSS/style.css" />
   <link rel="stylesheet" href="CSS/status.css" />
   <link rel="stylesheet" href="CSS/keyboard.css" />
-
 </head>
 <body class="bg-light">
 
+  <!-- Floating Shapes -->
+  <div class="bg-patterns">
+    <div class="circle c1"></div>
+    <div class="circle c2"></div>
+    <div class="circle c3"></div>
+    <div class="triangle t1"></div>
+    <div class="triangle t2"></div>
+    <div class="star s1"></div>
+    <div class="star s2"></div>
+  </div>
+
   <div class="container py-5">
+    <!-- RIGHT SIDE - Check Request Status -->
     <div class="row justify-content-center align-items-center g-4">
-
-
       <div class="col-md-6">
         <div class="card shadow-sm p-4 status-section">
           <h4 class="fw-bold mb-3 text-center">Check Request Status</h4>
-
           <div id="infoBox" class="info-box p-3 text-muted">
             <p>Enter your reference number below and press Enter to check the status.</p>
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- LEFT SIDE - Enter Reference Number Section -->
+    <!-- LEFT SIDE - Enter Reference Number -->
     <div class="row justify-content-center g-4">
-      <div class="col-md-6">
+      <div class="col-md-8 col-lg-7"> <!-- wider column -->
         <div class="card shadow-sm p-4 input-section text-center">
           <h5 class="fw-bold mb-3">Enter Reference Number</h5>
-          <!-- Reference number input field (only numbers allowed) -->
-          <input type="number" id="refInput" class="form-control mb-3 text-center fs-5" placeholder="Enter Reference Number" min="1">
+          <input type="number" id="refInput" class="form-control text-center"
+                placeholder="Reference Number" min="1">
         </div>
       </div>
     </div>
 
-    <!-- Back to Home Button centered -->
+    <!-- Back to Home Button -->
     <div class="text-center mt-4">
-      <button class="btn btn-outline-primary px-4 btn-custom" onclick="window.location.href='index.html'">← Back to Home</button>
+      <a href="index.html" class="btn btn-outline-primary px-5 btn-custom">← Back to Home</a>
     </div>
   </div>
 
   <!-- On-Screen Keyboard -->
   <div id="keyboard" class="p-3">
-    <!-- Mic button replacing the checkbox -->
     <div id="voiceToggle" class="mb-2 text-center">
       <button class="mic-btn" id="micBtn" title="Toggle voice command">🎤</button>
     </div>
@@ -81,106 +87,59 @@
     const keyboard = document.getElementById("keyboard");
     const micBtn = document.getElementById("micBtn");
 
-    // Show on-screen keyboard when text box is clicked
-    refInput.addEventListener("focus", () => {
-      keyboard.style.display = "block";
-    });
+    refInput.addEventListener("focus", () => { keyboard.style.display = "block"; });
 
-    // Hide the keyboard when Enter is pressed (and show status)
     refInput.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         const ref = (refInput.value ?? "").trim();
         let statusMessage = "";
 
-        // Define the responses based on reference number
         switch(ref) {
           case "1":
-            statusMessage = `
-              <h6 class="fw-bold text-info">Status: On Queue</h6>
-              <p><strong>Date Submitted:</strong> 10/29/2025</p>
-              <p><strong>Last Updated:</strong> 10/30/2025</p>
-            `;
-            break;
+            statusMessage = `<h6 class="fw-bold text-info">Status: On Queue</h6><p><strong>Date Submitted:</strong> 10/29/2025</p><p><strong>Last Updated:</strong> 10/30/2025</p>`; break;
           case "2":
-            statusMessage = `
-              <h6 class="fw-bold text-info">Status: Processing</h6>
-              <p><strong>Date Submitted:</strong> 10/29/2025</p>
-              <p><strong>Last Updated:</strong> 10/30/2025</p>
-            `;
-            break;
+            statusMessage = `<h6 class="fw-bold text-info">Status: Processing</h6><p><strong>Date Submitted:</strong> 10/29/2025</p><p><strong>Last Updated:</strong> 10/30/2025</p>`; break;
           case "3":
-            statusMessage = `
-              <h6 class="fw-bold text-info">Status: Payment Pending</h6>
-              <p><strong>Date Submitted:</strong> 10/29/2025</p>
-              <p><strong>Last Updated:</strong> 10/30/2025</p>
-            `;
-            break;
+            statusMessage = `<h6 class="fw-bold text-info">Status: Payment Pending</h6><p><strong>Date Submitted:</strong> 10/29/2025</p><p><strong>Last Updated:</strong> 10/30/2025</p>`; break;
           case "4":
-            statusMessage = `
-              <h6 class="fw-bold text-info">Status: Ready to Pickup</h6>
-              <p><strong>Date Submitted:</strong> 10/29/2025</p>
-              <p><strong>Last Updated:</strong> 10/30/2025</p>
-            `;
-            break;
+            statusMessage = `<h6 class="fw-bold text-info">Status: Ready to Pickup</h6><p><strong>Date Submitted:</strong> 10/29/2025</p><p><strong>Last Updated:</strong> 10/30/2025</p>`; break;
           case "5":
-            statusMessage = `
-              <h6 class="fw-bold text-info">Status: Released</h6>
-              <p><strong>Date Submitted:</strong> 10/29/2025</p>
-              <p><strong>Last Updated:</strong> 10/30/2025</p>
-            `;
-            break;
+            statusMessage = `<h6 class="fw-bold text-info">Status: Released</h6><p><strong>Date Submitted:</strong> 10/29/2025</p><p><strong>Last Updated:</strong> 10/30/2025</p>`; break;
           default:
             statusMessage = `<p class='text-warning'>No record found for Reference No. ${ref}.</p>`;
         }
 
-        // Update the infoBox with the status message
         infoBox.innerHTML = statusMessage;
-
-        // Hide the keyboard
         keyboard.style.display = "none";
       }
     });
 
-    // Handle keyboard button clicks
     document.getElementById("keyboardLayout").addEventListener("click", (e) => {
       const key = e.target.dataset.key;
       if (key) {
-        if (key === "clear") {
-          refInput.value = "";
-        } else if (key === "enter") {
-          // trigger Enter behavior
+        if (key === "clear") { refInput.value = ""; }
+        else if (key === "enter") {
           refInput.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
         } else {
-          // append numeric key
-          // ensure not to break min attribute: simply append as string
           refInput.value = (refInput.value ?? "") + key;
-          refInput.focus(); // keep focus so keyboard remains visible
+          refInput.focus();
         }
       }
     });
 
-    // Mic button toggling (visual only)
     micBtn.addEventListener('click', () => {
       micBtn.classList.toggle('active');
-
       if (micBtn.classList.contains('active')) {
-        // placeholder: start listening
         micBtn.setAttribute('title', 'Listening... click to stop');
-        // optionally provide visual feedback in infoBox
         infoBox.innerHTML = `<p class="text-success">Voice command enabled (placeholder). Speak now...</p>`;
-        // Here you could start Web Speech API recognition if desired.
       } else {
-        // stop listening
         micBtn.setAttribute('title', 'Toggle voice command');
         infoBox.innerHTML = `<p class="text-muted">Voice command disabled.</p>`;
       }
     });
 
-    // Optional: hide keyboard when clicking outside input and keyboard
     document.addEventListener('mousedown', (e) => {
-      if (!keyboard.contains(e.target) && e.target !== refInput) {
-        keyboard.style.display = 'none';
-      }
+      if (!keyboard.contains(e.target) && e.target !== refInput) keyboard.style.display = 'none';
     });
   </script>
 </body>
