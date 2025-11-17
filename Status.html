@@ -87,10 +87,10 @@ const infoBox = document.getElementById("infoBox");
 const keyboard = document.getElementById("keyboard");
 const micBtn = document.getElementById("micBtn");
 
-// Detect if DeviceCheck exists
-const isPhone = window.DeviceCheck?.isRealPhone?.() ?? false;
+// Detect if mobile via DeviceCheck or screen width fallback
+const isMobile = window.DeviceCheck?.isRealPhone?.() ?? (window.innerWidth <= 768);
 
-// Function to show status based on input
+// Function to show status
 function checkStatus() {
     const ref = (refInput.value ?? "").trim();
     let statusMessage = "";
@@ -127,24 +127,25 @@ function checkStatus() {
 
     infoBox.innerHTML = statusMessage;
 
-    // Hide keyboard after enter for desktop
-    if (!isPhone) keyboard.style.display = "none";
+    if (!isMobile) keyboard.style.display = "none";
 }
 
-// MOBILE: native numeric keyboard
-if (isPhone) {
+// -------------------- MOBILE --------------------
+if (isMobile) {
+    // Use native keyboard
     keyboard.style.display = "none";
     refInput.removeAttribute("readonly");
     refInput.setAttribute("inputmode", "numeric");
-    setTimeout(() => refInput.focus(), 300);
-} else {
-    // DESKTOP/KIOSK: custom keyboard
-    keyboard.style.display = "block"; // make sure it's visible
+    refInput.setAttribute("pattern", "[0-9]*"); // extra safety for numeric input
+}
+
+// -------------------- DESKTOP / KIOSK --------------------
+else {
+    keyboard.style.display = "block";
     refInput.setAttribute("readonly", true);
 
-    refInput.addEventListener("focus", () => {
-        keyboard.style.display = "block";
-    });
+    // Show keyboard when input is focused
+    refInput.addEventListener("focus", () => keyboard.style.display = "block");
 
     // Click outside input/keyboard → hide keyboard
     document.addEventListener("click", (e) => {
@@ -153,24 +154,21 @@ if (isPhone) {
         }
     });
 
-    // Handle custom keyboard buttons
+    // Keyboard button clicks
     document.getElementById("keyboardLayout").addEventListener("click", (e) => {
         const key = e.target.dataset.key;
         if (!key) return;
 
-        if (key === "clear") {
-            refInput.value = "";
-        } else if (key === "enter") {
-            checkStatus();
-        } else {
-            refInput.value += key;
-        }
+        if (key === "clear") refInput.value = "";
+        else if (key === "enter") checkStatus();
+        else refInput.value += key;
 
         refInput.focus();
     });
 }
 
-// ENTER key (for both native keyboard and desktop)
+// -------------------- COMMON --------------------
+// Press Enter key
 refInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") checkStatus();
 });
@@ -178,14 +176,13 @@ refInput.addEventListener("keydown", (event) => {
 // Voice toggle
 micBtn.addEventListener("click", () => {
     micBtn.classList.toggle("active");
-
-    if (micBtn.classList.contains("active")) {
-        infoBox.innerHTML = `<p class="text-success">Voice command enabled (placeholder). Speak now...</p>`;
-    } else {
-        infoBox.innerHTML = `<p class="text-muted">Voice command disabled.</p>`;
-    }
+    infoBox.innerHTML = micBtn.classList.contains("active")
+        ? `<p class="text-success">Voice command enabled (placeholder). Speak now...</p>`
+        : `<p class="text-muted">Voice command disabled.</p>`;
 });
 </script>
+
+
 
 
 </body>
