@@ -260,3 +260,57 @@ body {
 
   .keyboard-button { font-size: 2.6rem; height: 110px; }
 }
+
+/* =========================================
+   TRUE MOBILE FIX — FINAL OVERRIDES
+   ========================================= */
+@media (max-width: 600px) {
+
+  body {
+    font-size: 1rem;
+    line-height: 1.4;
+    padding: 20px 0;
+    overflow-y: auto;   /* allow scrolling */
+  }
+
+  .status-section,
+  .input-section {
+    padding: 25px 20px !important;
+    margin-bottom: 25px;
+    border-radius: 20px;
+  }
+
+  .status-section h4,
+  .input-section h5 {
+    font-size: 1.4rem !important;
+    margin-bottom: 15px;
+  }
+
+  #refInput {
+    height: 70px !important;
+    font-size: 1.4rem !important;
+    padding: 10px !important;
+  }
+
+  #refInput::placeholder {
+    font-size: 1.2rem !important;
+  }
+
+  .btn-custom,
+  .btn-outline-primary {
+    font-size: 1.3rem !important;
+    padding: 12px 25px !important;
+    width: 100%;
+  }
+
+  /* Shrink floating shapes */
+  .circle, .triangle, .star {
+    transform: scale(0.45) !important;
+    opacity: 0.15 !important;
+  }
+
+  /* Disable giant info text */
+  .info-box p {
+    font-size: 1.3rem !important;
+  }
+}
