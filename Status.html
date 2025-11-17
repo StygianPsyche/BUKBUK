@@ -81,106 +81,112 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
- <script>
-  const refInput = document.getElementById("refInput");
-  const infoBox = document.getElementById("infoBox");
-  const keyboard = document.getElementById("keyboard");
-  const micBtn = document.getElementById("micBtn");
+<script>
+const refInput = document.getElementById("refInput");
+const infoBox = document.getElementById("infoBox");
+const keyboard = document.getElementById("keyboard");
+const micBtn = document.getElementById("micBtn");
 
-  // Detect mobile
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+// Detect if DeviceCheck exists
+const isPhone = window.DeviceCheck?.isRealPhone?.() ?? false;
 
-  // If mobile: hide on-screen keyboard + allow native keyboard
-  if (isMobile) {
-    keyboard.style.display = "none";
-    refInput.setAttribute("inputmode", "numeric");
-    refInput.setAttribute("pattern", "[0-9]*");
-  } else {
-    // Desktop: show on-screen keyboard when input is focused
-    refInput.addEventListener("focus", () => {
-      keyboard.style.display = "block";
-    });
-  }
+// Function to show status based on input
+function checkStatus() {
+    const ref = (refInput.value ?? "").trim();
+    let statusMessage = "";
 
-  // ENTER key logic
-  refInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      const ref = (refInput.value ?? "").trim();
-      let statusMessage = "";
-
-      switch(ref) {
+    switch(ref) {
         case "1":
-          statusMessage = `<h6 class="fw-bold text-info">Status: On Queue</h6>
-          <p><strong>Date Submitted:</strong> 10/29/2025</p>
-          <p><strong>Last Updated:</strong> 10/30/2025</p>`;
-          break;
-
+            statusMessage = `<h6 class="fw-bold text-info">Status: On Queue</h6>
+            <p><strong>Date Submitted:</strong> 10/29/2025</p>
+            <p><strong>Last Updated:</strong> 10/30/2025</p>`;
+            break;
         case "2":
-          statusMessage = `<h6 class="fw-bold text-info">Status: Processing</h6>
-          <p><strong>Date Submitted:</strong> 10/29/2025</p>
-          <p><strong>Last Updated:</strong> 10/30/2025</p>`;
-          break;
-
+            statusMessage = `<h6 class="fw-bold text-info">Status: Processing</h6>
+            <p><strong>Date Submitted:</strong> 10/29/2025</p>
+            <p><strong>Last Updated:</strong> 10/30/2025</p>`;
+            break;
         case "3":
-          statusMessage = `<h6 class="fw-bold text-info">Status: Payment Pending</h6>
-          <p><strong>Date Submitted:</strong> 10/29/2025</p>
-          <p><strong>Last Updated:</strong> 10/30/2025</p>`;
-          break;
-
+            statusMessage = `<h6 class="fw-bold text-info">Status: Payment Pending</h6>
+            <p><strong>Date Submitted:</strong> 10/29/2025</p>
+            <p><strong>Last Updated:</strong> 10/30/2025</p>`;
+            break;
         case "4":
-          statusMessage = `<h6 class="fw-bold text-info">Status: Ready to Pickup</h6>
-          <p><strong>Date Submitted:</strong> 10/29/2025</p>
-          <p><strong>Last Updated:</strong> 10/30/2025</p>`;
-          break;
-
+            statusMessage = `<h6 class="fw-bold text-info">Status: Ready to Pickup</h6>
+            <p><strong>Date Submitted:</strong> 10/29/2025</p>
+            <p><strong>Last Updated:</strong> 10/30/2025</p>`;
+            break;
         case "5":
-          statusMessage = `<h6 class="fw-bold text-info">Status: Released</h6>
-          <p><strong>Date Submitted:</strong> 10/29/2025</p>
-          <p><strong>Last Updated:</strong> 10/30/2025</p>`;
-          break;
-
+            statusMessage = `<h6 class="fw-bold text-info">Status: Released</h6>
+            <p><strong>Date Submitted:</strong> 10/29/2025</p>
+            <p><strong>Last Updated:</strong> 10/30/2025</p>`;
+            break;
         default:
-          statusMessage = `<p class='text-warning'>No record found for Reference No. ${ref}.</p>`;
-      }
-
-      infoBox.innerHTML = statusMessage;
-
-      // Desktop only: hide custom keyboard after enter
-      if (!isMobile) {
-        keyboard.style.display = "none";
-      }
+            statusMessage = `<p class='text-warning'>No record found for Reference No. ${ref}.</p>`;
     }
-  });
 
-  // On-screen keyboard buttons (desktop only)
-  if (!isMobile) {
-    document.getElementById("keyboardLayout").addEventListener("click", (e) => {
-      const key = e.target.dataset.key;
-      if (!key) return;
+    infoBox.innerHTML = statusMessage;
 
-      if (key === "clear") {
-        refInput.value = "";
-      } else if (key === "enter") {
-        refInput.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-      } else {
-        refInput.value = (refInput.value ?? "") + key;
-        refInput.focus();
-      }
+    // Hide keyboard after enter for desktop
+    if (!isPhone) keyboard.style.display = "none";
+}
+
+// MOBILE: native numeric keyboard
+if (isPhone) {
+    keyboard.style.display = "none";
+    refInput.removeAttribute("readonly");
+    refInput.setAttribute("inputmode", "numeric");
+    setTimeout(() => refInput.focus(), 300);
+} else {
+    // DESKTOP/KIOSK: custom keyboard
+    keyboard.style.display = "block"; // make sure it's visible
+    refInput.setAttribute("readonly", true);
+
+    refInput.addEventListener("focus", () => {
+        keyboard.style.display = "block";
     });
-  }
 
-  // Voice toggle
-  micBtn.addEventListener('click', () => {
-    micBtn.classList.toggle('active');
-    if (micBtn.classList.contains('active')) {
-      micBtn.setAttribute('title', 'Listening... click to stop');
-      infoBox.innerHTML = `<p class="text-success">Voice command enabled (placeholder). Speak now...</p>`;
+    // Click outside input/keyboard → hide keyboard
+    document.addEventListener("click", (e) => {
+        if (!refInput.contains(e.target) && !keyboard.contains(e.target)) {
+            keyboard.style.display = "none";
+        }
+    });
+
+    // Handle custom keyboard buttons
+    document.getElementById("keyboardLayout").addEventListener("click", (e) => {
+        const key = e.target.dataset.key;
+        if (!key) return;
+
+        if (key === "clear") {
+            refInput.value = "";
+        } else if (key === "enter") {
+            checkStatus();
+        } else {
+            refInput.value += key;
+        }
+
+        refInput.focus();
+    });
+}
+
+// ENTER key (for both native keyboard and desktop)
+refInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") checkStatus();
+});
+
+// Voice toggle
+micBtn.addEventListener("click", () => {
+    micBtn.classList.toggle("active");
+
+    if (micBtn.classList.contains("active")) {
+        infoBox.innerHTML = `<p class="text-success">Voice command enabled (placeholder). Speak now...</p>`;
     } else {
-      micBtn.setAttribute('title', 'Toggle voice command');
-      infoBox.innerHTML = `<p class="text-muted">Voice command disabled.</p>`;
+        infoBox.innerHTML = `<p class="text-muted">Voice command disabled.</p>`;
     }
-  });
+});
 </script>
+
 
 </body>
 </html>
