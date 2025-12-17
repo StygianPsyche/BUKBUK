@@ -6,7 +6,7 @@ document.getElementById('statusBtn').addEventListener('click',()=>window.locatio
 let idleTimer;
 const idleTime = 10000; // 30 seconds
 const idleScreen = document.getElementById('idleScreen');
-
+// sad
 function showIdleScreen() { idleScreen.style.display = 'flex'; }
 function hideIdleScreen() { idleScreen.style.display = 'none'; resetIdleTimer(); }
 function resetIdleTimer() { clearTimeout(idleTimer); idleTimer = setTimeout(showIdleScreen, idleTime); }
