@@ -1,6 +1,6 @@
 // Dashboard Buttons
 document.getElementById('requestBtn').addEventListener('click',()=>window.location.href='pages/request.html');
-document.getElementById('statusBtn').addEventListener('click',()=>window.location.href='pages/Status.html');
+document.getElementById('statusBtn').addEventListener('click',()=>window.location.href='pages/status.html');
 
 // Idle Screen Logic
 let idleTimer;
