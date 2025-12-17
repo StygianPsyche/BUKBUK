@@ -1,6 +1,7 @@
 // ---------- Utils ----------
-const formContainer = document.getElementById('formContainer');
-const requestTypeSelect = document.getElementById('requestTypeSelect');
+let requestTypeSelect;
+let formContainer;
+
 const keyboard = document.getElementById('keyboard');
 let currentInput = null;
 
@@ -84,7 +85,7 @@ function initializeDatePickers() {
 
         // Add event listener to year to display a list of years when clicked
         const yearLabel = monthNav.querySelector('.flatpickr-current-month');
-        yearLabel.addEventListener('click', function() {
+        yearLabel.addEventListener('click', function () {
           showYearDropdown(instance, yearLabel);  // Show the year dropdown when the year is clicked
         });
 
@@ -200,6 +201,7 @@ function updateCurrentYearHighlight(yearList, currentYear) {
 
 
 // ---------- Templates ----------
+
 function template_FORM1_COMMON(purposeLabel = 'PURPOSE') {
   // shared among various Form 1 variants
   return `
@@ -486,57 +488,46 @@ function formHTML_FORM3_BPO() {
         </form>
       `;
 }
+// ---------- TEMPLATE REGISTRY ----------
+const TEMPLATE_REGISTRY = {
+  "certificate": {
+    title: "Issuance of Barangay Certificate",
+    render: () => formHTML_FORM1("PURPOSE")
+  },
+
+  "residency-certificate": {
+    title: "Residency Certificate",
+    render: () => formHTML_FORM1("PURPOSE")
+  },
+
+  "business-permit-endorsement": {
+    title: "Business Permit Endorsement",
+    render: () => formHTML_FORM1("BUSINESS PURPOSE")
+  }
+};
+
+
 
 // ---------- Render & Init ----------
 function renderSelectedForm() {
   const val = requestTypeSelect.value;
-  let titleText = '';
+  const config = TEMPLATE_REGISTRY[val];
 
-  switch (val) {
-    case 'form1_cert':
-      titleText = 'Issuance of Barangay Certificate';
-      formContainer.innerHTML = formHTML_FORM1('PURPOSE');
-      break;
-    case 'form1_clear':
-      titleText = 'Barangay Clearance';
-      formContainer.innerHTML = formHTML_FORM1('PURPOSE');
-      break;
-    case 'form1_bus':
-      titleText = 'Barangay Business Clearance';
-      formContainer.innerHTML = formHTML_FORM1('BUSINESS PURPOSE');
-      break;
-    case 'form2_cons':
-      titleText = 'Issuance of Construction, Work, Advertisement, Signage, and Events Clearance';
-      formContainer.innerHTML = formHTML_FORM2_CONSTRUCTION();
-      break;
-    case 'form2_fac':
-      titleText = 'Use of Barangay Facilities and Properties';
-      formContainer.innerHTML = formHTML_FORM2_FACILITIES();
-      break;
-    case 'form3_katar':
-      titleText = 'Katarungang Pambarangay';
-      formContainer.innerHTML = formHTML_FORM3_KATAR();
-      break;
-    case 'form3_file':
-      titleText = 'Certificate to File Action';
-      formContainer.innerHTML = formHTML_FORM3_FILEACTION();
-      break;
-    case 'form3_bpo':
-      titleText = 'Barangay Protection Order';
-      formContainer.innerHTML = formHTML_FORM3_BPO();
-      break;
-    default:
-      formContainer.innerHTML = '<div class="p-3">Select a request type.</div>';
-      return;
+  if (!config) {
+    formContainer.innerHTML = '<p>Select a request type.</p>';
+    return;
   }
 
-  // Insert the title above the form
-  formContainer.insertAdjacentHTML('afterbegin', `<h3 class="text-center fw-bold mb-3">${titleText}</h3>`);
+  formContainer.innerHTML = `
+  <h3 class="text-center fw-bold mb-3">${config.title}</h3>
+  ${config.render()}
+  `;
+  console.log('renderSelectedForm fired:', requestTypeSelect.value);
 
-  // Reinitialize form behaviors
   initFormBehaviors();
   initializeDatePickers();
 }
+
 
 
 
@@ -1072,10 +1063,26 @@ function showSummary(formEl) {
 }
 
 // ---------- startup ----------
-requestTypeSelect.addEventListener('change', renderSelectedForm);
+// requestTypeSelect.addEventListener('change', renderSelectedForm);
 document.getElementById('backBtn').addEventListener('click', () => {
   window.location.href = '../index.html';
 });
 
 // initial render
-renderSelectedForm();
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  requestTypeSelect = document.getElementById('requestTypeSelect');
+  formContainer = document.getElementById('formContainer');
+
+  // ✅ EXIT SILENTLY IF NOT ON REQUEST PAGE
+  if (!requestTypeSelect || !formContainer) {
+    return;
+  }
+
+  console.log('✅ script.js connected on request page');
+
+  requestTypeSelect.addEventListener('change', renderSelectedForm);
+});
+
+

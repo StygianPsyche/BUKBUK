@@ -86,37 +86,29 @@
 </head>
 
 <body class="bg-light">
-<div class="bg-patterns">
-  <div class="circle shape"></div>
-  <div class="circle shape"></div>
-  <div class="circle shape"></div>
-  <div class="triangle shape"></div>
-  <div class="triangle shape"></div>
-  <div class="star shape"></div>
-  <div class="star shape"></div>
-  <div class="hexagon shape"></div>
-  <div class="hexagon shape"></div>
-  <div class="diamond shape"></div>
-  <div class="diamond shape"></div>
-</div>
+  <div class="bg-patterns">
+    <div class="circle shape"></div>
+    <div class="circle shape"></div>
+    <div class="circle shape"></div>
+    <div class="triangle shape"></div>
+    <div class="triangle shape"></div>
+    <div class="star shape"></div>
+    <div class="star shape"></div>
+    <div class="hexagon shape"></div>
+    <div class="hexagon shape"></div>
+    <div class="diamond shape"></div>
+    <div class="diamond shape"></div>
+  </div>
 
 
   <div class="container py-5">
     <div class="row">
-      <!-- LEFT SIDE -->
       <div class="col-md-12 mb-4">
         <div class="card shadow-sm p-3 text-center">
-          <h5 class="fw-bold mb-3">Request Types</h5>
-          <select class="form-select" id="requestTypeSelect" aria-label="Select request type">
-            <option value="form1_cert">Issuance of Barangay Certificate</option>
-            <option value="form1_clear">Barangay Clearance</option>
-            <option value="form1_bus">Barangay Business Clearance</option>
-            <option value="form2_cons">Issuance of Construction, Work, Advertisement, Signage, and Events Clearance
-            </option>
-            <option value="form2_fac">Use of Barangay Facilities, and Properties</option>
-            <option value="form3_katar">Katarungang Pambarangay</option>
-            <option value="form3_file">Certificate to File Action</option>
-            <option value="form3_bpo">Barangay Protection Order</option>
+          <h5 class="fw-bold mb-3 text-center">Request Types</h5>
+          <!-- show the request types -->
+          <select class="form-select" id="requestTypeSelect">
+            <option value="">-- Select Request Type --</option>
           </select>
         </div>
       </div>
@@ -245,7 +237,8 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../js/script.js"></script>
+  <script src="../js/request.js" defer></script>
+  <script src="../js/script.js" defer></script>
 
 </body>
 
