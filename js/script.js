@@ -1074,7 +1074,7 @@ function showSummary(formEl) {
 // ---------- startup ----------
 requestTypeSelect.addEventListener('change', renderSelectedForm);
 document.getElementById('backBtn').addEventListener('click', () => {
-  window.location.href = 'index.html';
+  window.location.href = '../index.html';
 });
 
 // initial render
