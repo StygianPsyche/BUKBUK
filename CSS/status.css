@@ -19,6 +19,78 @@ body {
   line-height: 1.8;
 }
 
+/* Form container */
+/* Default (desktop kiosk) */
+#formContainer {
+  max-height: calc(100vh - 260px);
+}
+
+/* Tablets */
+@media (max-width: 1024px) {
+  #formContainer {
+    max-height: calc(100vh - 220px);
+  }
+}
+
+/* Phones */
+@media (max-width: 768px) {
+  #formContainer {
+    max-height: calc(100vh - 180px);
+    padding-bottom: 200px;
+    /* smaller keyboard */
+  }
+}
+
+/* Hide kiosk keyboard on phones */
+@media (max-width: 768px) {
+  .keyboard {
+    display: none !important;
+  }
+}
+
+
+#formContainer {
+  max-height: calc(100vh - 250px);
+  /* adjust based on header + buttons */
+  overflow-y: auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+#formContainer {
+  padding-bottom: 280px;
+  /* height of on-screen keyboard */
+}
+
+#formContainer {
+  scroll-behavior: smooth;
+}
+
+input,
+select,
+textarea {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+
+  input,
+  select,
+  textarea {
+    font-size: 1.1rem;
+  }
+
+  button {
+    font-size: 1.1rem;
+    padding: 0.75rem;
+  }
+}
+
+.modal-dialog {
+  margin: 1rem;
+}
+
+
 /* Floating shapes */
 .bg-patterns {
   position: fixed;
@@ -27,7 +99,9 @@ body {
   z-index: 0;
 }
 
-.circle, .triangle, .star {
+.circle,
+.triangle,
+.star {
   position: absolute;
   opacity: 0.3;
   pointer-events: none;
@@ -54,9 +128,17 @@ body {
 }
 
 @keyframes float {
-  0% { transform: translateY(0) rotate(0deg) scale(1); }
-  50% { transform: translateY(-25px) rotate(180deg) scale(1.1); }
-  100% { transform: translateY(0) rotate(360deg) scale(1); }
+  0% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+
+  50% {
+    transform: translateY(-25px) rotate(180deg) scale(1.1);
+  }
+
+  100% {
+    transform: translateY(0) rotate(360deg) scale(1);
+  }
 }
 
 /* ==============================
@@ -104,9 +186,12 @@ body {
   border: none;
   border-radius: 25px;
   width: 100%;
-  height: 140px;           /* explicit height for big numbers */
-  padding: 0 20px;         /* horizontal padding only */
-  font-size: 2rem;         /* huge typed numbers */
+  height: 140px;
+  /* explicit height for big numbers */
+  padding: 0 20px;
+  /* horizontal padding only */
+  font-size: 2rem;
+  /* huge typed numbers */
   line-height: 1.1;
   color: #2e8b57;
   text-align: center;
@@ -118,7 +203,8 @@ body {
 
 /* Placeholder slightly smaller */
 #refInput::placeholder {
-  font-size: 3.5rem;       /* readable but smaller than typed numbers */
+  font-size: 3.5rem;
+  /* readable but smaller than typed numbers */
   color: rgba(46, 139, 87, 0.7);
   font-weight: 700;
   text-align: center;
@@ -168,6 +254,14 @@ body {
 /* ==============================
    On-screen Keyboard
    ============================== */
+/* Hide kiosk keyboard on phones & tablets */
+@media (max-width: 768px) {
+  #keyboard {
+    display: none !important;
+  }
+}
+
+
 #keyboard {
   display: none;
   position: fixed;
@@ -199,11 +293,15 @@ body {
   width: 95%;
   max-width: 280px;
   height: 130px;
-  display: flex;               /* use flexbox */
-  align-items: center;         /* vertical center */
-  justify-content: center;     /* horizontal center */
+  display: flex;
+  /* use flexbox */
+  align-items: center;
+  /* vertical center */
+  justify-content: center;
+  /* horizontal center */
   transition: all 0.2s ease;
-  text-align: center;          /* fallback text center */
+  text-align: center;
+  /* fallback text center */
 }
 
 
@@ -250,13 +348,116 @@ body {
    Responsive Tweaks
    ============================== */
 @media (max-width: 1080px) {
+
   .status-section h4,
-  .input-section h5 { font-size: 2.5rem; }
+  .input-section h5 {
+    font-size: 2.5rem;
+  }
 
-  #refInput { font-size: 4rem; height: 120px; padding: 0 15px; line-height: 1.1; }
-  #refInput::placeholder { font-size: 3rem; }
+  #refInput {
+    font-size: 4rem;
+    height: 120px;
+    padding: 0 15px;
+    line-height: 1.1;
+  }
 
-  .btn-custom, .btn-outline-primary { font-size: 2.4rem; padding: 22px 50px; }
+  #refInput::placeholder {
+    font-size: 3rem;
+  }
 
-  .keyboard-button { font-size: 2.6rem; height: 110px; }
+  .btn-custom,
+  .btn-outline-primary {
+    font-size: 2.4rem;
+    padding: 22px 50px;
+  }
+
+  .keyboard-button {
+    font-size: 2.6rem;
+    height: 110px;
+  }
+}
+
+
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 1.4rem;
+    line-height: 1.5;
+  }
+
+  .info-box p {
+    font-size: 1.3rem;
+  }
+}
+
+/* =========================================
+   📱 MOBILE OVERRIDE — disable kiosk layout
+   ========================================= */
+@media (max-width: 768px) {
+
+  /* Stop kiosk centering */
+  body {
+    display: block;
+    min-height: auto;
+    overflow-y: auto;
+    text-align: center;
+  }
+
+  /* Let cards flow naturally */
+  .container {
+    width: 100%;
+    max-width: 100%;
+    padding: 16px 0;
+  }
+
+  .status-section,
+  .input-section {
+    width: 92%;
+    max-width: 420px;
+    margin: 20px auto;
+    padding: 24px 18px;
+    border-radius: 20px;
+  }
+
+  /* Reduce heading size */
+  .status-section h4,
+  .input-section h5 {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  /* Reduce paragraph text */
+  .info-box p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  /* Input field size fix */
+  #refInput {
+    height: 70px;
+    font-size: 1.5rem;
+  }
+
+  #refInput::placeholder {
+    font-size: 1.2rem;
+  }
+
+  /* Buttons */
+  .btn-custom,
+  .btn-outline-primary {
+    font-size: 1.2rem;
+    padding: 14px 24px;
+  }
+}
+
+.status-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #2f8f5b, #3aa76d);
 }

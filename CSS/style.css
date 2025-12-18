@@ -13,6 +13,74 @@ body {
   text-align: center;
 }
 
+/* Form container */
+/* Default (desktop kiosk) */
+#formContainer {
+  max-height: calc(100vh - 260px);
+}
+
+/* Tablets */
+@media (max-width: 1024px) {
+  #formContainer {
+    max-height: calc(100vh - 220px);
+  }
+}
+
+/* Phones */
+@media (max-width: 768px) {
+  #formContainer {
+    max-height: calc(100vh - 180px);
+    padding-bottom: 200px; /* smaller keyboard */
+  }
+}
+
+/* Hide kiosk keyboard on phones */
+@media (max-width: 768px) {
+  .keyboard {
+    display: none !important;
+  }
+}
+
+
+#formContainer {
+  max-height: calc(100vh - 250px); /* adjust based on header + buttons */
+  overflow-y: auto;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+#formContainer {
+  padding-bottom: 280px; /* height of on-screen keyboard */
+}
+
+#formContainer {
+  scroll-behavior: smooth;
+}
+
+input,
+select,
+textarea {
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 1.1rem;
+  }
+
+  button {
+    font-size: 1.1rem;
+    padding: 0.75rem;
+  }
+}
+
+.modal-dialog {
+  margin: 1rem;
+}
+
+
 /* Soft animated circle patterns */
 .bg-circles {
   position: fixed;
