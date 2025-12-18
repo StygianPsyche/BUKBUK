@@ -992,3 +992,56 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+function renderDynamicKioskForm(fields) {
+  const form = document.createElement("form");
+  form.id = "activeForm";
+  form.noValidate = true;
+
+  fields.forEach(f => {
+    const group = document.createElement("div");
+    group.className = "mb-3";
+
+    const label = document.createElement("label");
+    label.className = "form-label";
+    label.textContent = f.label;
+
+    let input;
+
+    // basic input types for kiosk (we keep it simple)
+    if (f.field_type === "textarea") {
+      input = document.createElement("textarea");
+      input.rows = 3;
+    } else {
+      input = document.createElement("input");
+      input.type = f.field_type; // text, number, date
+    }
+
+    input.name = f.field_key;
+    input.className = "form-control";
+    input.autocomplete = "off";
+
+    if (Number(f.is_required) === 1) {
+      input.required = true;
+    }
+
+    group.appendChild(label);
+    group.appendChild(input);
+    form.appendChild(group);
+  });
+
+  const submitBtn = document.createElement("button");
+  submitBtn.type = "submit";
+  submitBtn.className = "btn btn-primary w-100 mt-3";
+  submitBtn.textContent = "Submit Request";
+
+  form.appendChild(submitBtn);
+
+  // render into kiosk
+  formContainer.innerHTML = "";
+  formContainer.appendChild(form);
+
+  // 🔥 reuse your existing, working logic
+  initFormBehaviors();
+  wireOnScreenKeyboard();
+  initializeDatePickers();
+}

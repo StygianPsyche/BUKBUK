@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 17, 2025 at 08:26 AM
+-- Generation Time: Dec 18, 2025 at 08:06 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -89,6 +89,30 @@ CREATE TABLE `cons_clearance` (
 CREATE TABLE `file_action` (
   `ref_number` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `form_fields`
+--
+
+CREATE TABLE `form_fields` (
+  `id` int(11) NOT NULL,
+  `field_key` varchar(50) NOT NULL,
+  `label` varchar(100) NOT NULL,
+  `field_type` enum('text','number','date') NOT NULL,
+  `is_required` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `form_fields`
+--
+
+INSERT INTO `form_fields` (`id`, `field_key`, `label`, `field_type`, `is_required`) VALUES
+(1, 'full_name', 'Full Name', 'text', 1),
+(2, 'address', 'Address', 'text', 1),
+(3, 'age', 'Age', 'number', 1),
+(4, 'purpose', 'Purpose', 'text', 0);
 
 -- --------------------------------------------------------
 
@@ -190,6 +214,7 @@ INSERT INTO `requests` (`id`, `ref_number`, `citizen_id`, `type_id`, `status`, `
 CREATE TABLE `request_types` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
+  `slug` varchar(100) DEFAULT NULL,
   `fee` decimal(10,2) NOT NULL DEFAULT 0.00,
   `form_template` varchar(100) NOT NULL DEFAULT 'Custom',
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
@@ -202,11 +227,34 @@ CREATE TABLE `request_types` (
 -- Dumping data for table `request_types`
 --
 
-INSERT INTO `request_types` (`id`, `name`, `fee`, `form_template`, `is_active`, `is_archived`, `inactive_since`, `created_at`) VALUES
-(1, 'Barangay Clearance', 25.00, 'Custom', 0, 1, '2025-11-01 16:34:17', '2025-11-01 12:57:38'),
-(3, 'Residency Certificate', 100.00, 'Custom', 1, 0, NULL, '2025-11-01 12:58:39'),
-(4, 'Business Permit Endorsement', 520.00, 'Custom', 1, 0, NULL, '2025-11-01 12:59:36'),
-(5, 'Solo Parent Certificate', 100.00, 'Individual Information Sheet', 1, 0, NULL, '2025-11-01 13:46:32');
+INSERT INTO `request_types` (`id`, `name`, `slug`, `fee`, `form_template`, `is_active`, `is_archived`, `inactive_since`, `created_at`) VALUES
+(1, 'Barangay Clearance', 'barangay-clearance', 25.00, 'Custom', 1, 0, '2025-11-01 16:34:17', '2025-11-01 12:57:38'),
+(3, 'Residency Certificate', 'residency-certificate', 100.00, 'Custom', 1, 0, NULL, '2025-11-01 12:58:39'),
+(4, 'Business Permit Endorsement', 'business-permit-endorsement', 520.00, 'Custom', 1, 0, NULL, '2025-11-01 12:59:36'),
+(5, 'Solo Parent Certificate', 'solo-parent-certificate', 100.00, 'Individual Information Sheet', 1, 0, NULL, '2025-11-01 13:46:32');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `request_type_fields`
+--
+
+CREATE TABLE `request_type_fields` (
+  `id` int(11) NOT NULL,
+  `request_type_id` int(11) NOT NULL,
+  `field_id` int(11) NOT NULL,
+  `field_order` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `request_type_fields`
+--
+
+INSERT INTO `request_type_fields` (`id`, `request_type_id`, `field_id`, `field_order`) VALUES
+(1, 1, 1, 1),
+(2, 1, 2, 2),
+(3, 1, 3, 3),
+(4, 1, 4, 4);
 
 -- --------------------------------------------------------
 
@@ -357,6 +405,13 @@ ALTER TABLE `file_action`
   ADD PRIMARY KEY (`ref_number`);
 
 --
+-- Indexes for table `form_fields`
+--
+ALTER TABLE `form_fields`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `field_key` (`field_key`);
+
+--
 -- Indexes for table `indi_info`
 --
 ALTER TABLE `indi_info`
@@ -384,6 +439,14 @@ ALTER TABLE `requests`
 ALTER TABLE `request_types`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `request_type_fields`
+--
+ALTER TABLE `request_type_fields`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `request_type_id` (`request_type_id`),
+  ADD KEY `field_id` (`field_id`);
 
 --
 -- Indexes for table `request_type_logs`
@@ -426,6 +489,12 @@ ALTER TABLE `citizen_action_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `form_fields`
+--
+ALTER TABLE `form_fields`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `login_logs`
 --
 ALTER TABLE `login_logs`
@@ -442,6 +511,12 @@ ALTER TABLE `requests`
 --
 ALTER TABLE `request_types`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `request_type_fields`
+--
+ALTER TABLE `request_type_fields`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `request_type_logs`
@@ -501,6 +576,13 @@ ALTER TABLE `login_logs`
 ALTER TABLE `requests`
   ADD CONSTRAINT `requests_ibfk_1` FOREIGN KEY (`citizen_id`) REFERENCES `citizens` (`id`),
   ADD CONSTRAINT `requests_ibfk_2` FOREIGN KEY (`type_id`) REFERENCES `request_types` (`id`);
+
+--
+-- Constraints for table `request_type_fields`
+--
+ALTER TABLE `request_type_fields`
+  ADD CONSTRAINT `request_type_fields_ibfk_1` FOREIGN KEY (`request_type_id`) REFERENCES `request_types` (`id`),
+  ADD CONSTRAINT `request_type_fields_ibfk_2` FOREIGN KEY (`field_id`) REFERENCES `form_fields` (`id`);
 
 --
 -- Constraints for table `request_type_logs`
