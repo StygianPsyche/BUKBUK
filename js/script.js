@@ -528,7 +528,16 @@ const TEMPLATE_REGISTRY = {
 /* =========================================================
    SHOW KEYBOARD
 ========================================================= */
+function isMobileOrTablet() {
+  return window.matchMedia('(max-width: 768px)').matches;
+}
+
+
+
+
+
 function showKeyboardForInput(input) {
+  if (isMobileOrTablet()) return;
   if (!keyboard) return;
 
   currentInput = input;
@@ -588,6 +597,8 @@ function enableKeyboardAutoHide() {
 
 
 function wireOnScreenKeyboard() {
+  if (isMobileOrTablet()) return;
+
   const inputs = document.querySelectorAll(
     '#formContainer input, #formContainer textarea'
   );
@@ -935,14 +946,6 @@ function renderDynamicKioskForm(fields) {
 }
 
 
-
-
-
-
-
-
-
-
 // ---------- startup ----------
 // requestTypeSelect.addEventListener('change', renderSelectedForm);
 document.addEventListener('DOMContentLoaded', () => {
@@ -1007,7 +1010,7 @@ function renderDynamicKioskForm(fields) {
 
     let input;
 
-    // basic input types for kiosk (we keep it simple)
+    // basic input types for kiosk
     if (f.field_type === "textarea") {
       input = document.createElement("textarea");
       input.rows = 3;
