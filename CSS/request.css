@@ -212,3 +212,33 @@ h5 {
   transform: scale(1.05);
   cursor: pointer;
 }
+
+
+/* ===== FIX BOOTSTRAP MODAL TEXT ===== */
+.modal,
+.modal-content {
+  color: #212529 !important; /* Bootstrap default text color */
+}
+
+.modal-title,
+.modal-body,
+.modal-footer,
+.modal-body p,
+.modal-body h5,
+.modal-body h6,
+.modal-body div,
+.modal-footer button {
+  color: #212529 !important;
+}
+
+.modal-footer .btn {
+  color: #fff !important;
+}
+
+.modal-footer .btn-secondary {
+  background-color: #6c757d !important;
+}
+
+.modal-footer .btn-primary {
+  background-color: #0d6efd !important;
+}

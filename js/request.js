@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       data.forEach(item => {
         const option = document.createElement("option");
-        option.value = item.slug;   // or item.id
+        option.value = item.id;
         option.textContent = item.name;
         select.appendChild(option);
       });
@@ -23,4 +23,21 @@ document.addEventListener("DOMContentLoaded", function () {
     .catch(error => {
       console.error("❌ Failed to load request types", error);
     });
+
+  select.addEventListener("change", () => {
+    const requestTypeId = select.value;
+    if (!requestTypeId) return;
+
+    console.log("📌 Selected request type ID:", requestTypeId);
+
+    fetch(`../api/get_request_fields.php?request_type_id=${requestTypeId}`)
+      .then(res => res.json())
+      .then(fields => {
+        console.log("📦 Fields for kiosk:", fields);
+        renderDynamicKioskForm(fields);
+      })
+      .catch(err => {
+        console.error("❌ Failed to load fields", err);
+      });
+  });
 });

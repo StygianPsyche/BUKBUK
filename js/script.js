@@ -2,7 +2,8 @@
 let requestTypeSelect;
 let formContainer;
 
-const keyboard = document.getElementById('keyboard');
+let keyboard = null;
+
 let currentInput = null;
 
 let _bdayChangeHandler = null;
@@ -494,39 +495,134 @@ const TEMPLATE_REGISTRY = {
     title: "Issuance of Barangay Certificate",
     render: () => formHTML_FORM1("PURPOSE")
   },
-
   "residency-certificate": {
     title: "Residency Certificate",
     render: () => formHTML_FORM1("PURPOSE")
   },
-
   "business-permit-endorsement": {
     title: "Business Permit Endorsement",
     render: () => formHTML_FORM1("BUSINESS PURPOSE")
+  },
+  "construction-clearance": {
+    title: "Construction / Work Clearance",
+    render: formHTML_FORM2_CONSTRUCTION
+  },
+  "facility-usage": {
+    title: "Use of Barangay Facilities",
+    render: formHTML_FORM2_FACILITIES
+  },
+  "katarungang-pambarangay": {
+    title: "Katarungang Pambarangay",
+    render: formHTML_FORM3_KATAR
+  },
+  "certificate-to-file-action": {
+    title: "Certificate to File Action",
+    render: formHTML_FORM3_FILEACTION
+  },
+  "barangay-protection-order": {
+    title: "Barangay Protection Order",
+    render: formHTML_FORM3_BPO
   }
 };
 
+/* =========================================================
+   SHOW KEYBOARD
+========================================================= */
+function showKeyboardForInput(input) {
+  if (!keyboard) return;
 
-
-// ---------- Render & Init ----------
-function renderSelectedForm() {
-  const val = requestTypeSelect.value;
-  const config = TEMPLATE_REGISTRY[val];
-
-  if (!config) {
-    formContainer.innerHTML = '<p>Select a request type.</p>';
-    return;
-  }
-
-  formContainer.innerHTML = `
-  <h3 class="text-center fw-bold mb-3">${config.title}</h3>
-  ${config.render()}
-  `;
-  console.log('renderSelectedForm fired:', requestTypeSelect.value);
-
-  initFormBehaviors();
-  initializeDatePickers();
+  currentInput = input;
+  keyboard.style.display = 'block';
+  keyboard.setAttribute('aria-hidden', 'false');
 }
+
+function wireKeyboardKeys() {
+  const keys = keyboard.querySelectorAll('.key');
+
+  keys.forEach(key => {
+    key.addEventListener('mousedown', (e) => {
+      e.preventDefault();      // stop focus loss
+      e.stopPropagation();     // stop auto-hide
+
+      if (!currentInput) return;
+
+      const value = key.dataset.key;
+
+      if (value === 'Delete') {
+        currentInput.value = currentInput.value.slice(0, -1);
+      } else if (value === 'Space') {
+        currentInput.value += ' ';
+      } else {
+        currentInput.value += value;
+      }
+
+      currentInput.dispatchEvent(
+        new Event('input', { bubbles: true })
+      );
+    });
+  });
+}
+
+function hideKeyboard() {
+  if (!keyboard) return;
+
+  keyboard.style.display = 'none';
+  keyboard.setAttribute('aria-hidden', 'true');
+  currentInput = null;
+}
+
+
+function enableKeyboardAutoHide() {
+  document.addEventListener('mousedown', (e) => {
+    if (!keyboard || !currentInput) return;
+
+    const clickedInsideKeyboard = keyboard.contains(e.target);
+    const clickedInput = e.target === currentInput;
+
+    if (!clickedInsideKeyboard && !clickedInput) {
+      hideKeyboard();
+    }
+  });
+}
+
+
+
+function wireOnScreenKeyboard() {
+  const inputs = document.querySelectorAll(
+    '#formContainer input, #formContainer textarea'
+  );
+
+  inputs.forEach(input => {
+    input.addEventListener('focus', () => {
+      showKeyboardForInput(input);
+    });
+  });
+}
+
+
+/* =========================================================
+   RENDER FORM BASED ON SELECT
+========================================================= */
+function renderSelectedForm() {
+  const requestTypeId = requestTypeSelect.value;
+  if (!requestTypeId) return;
+
+  fetch(`../api/get_request_fields.php?request_type_id=${requestTypeId}`)
+    .then(res => res.json())
+    .then(fields => {
+      if (!fields.length) {
+        formContainer.innerHTML = '<p class="text-center">No fields configured.</p>';
+        return;
+      }
+
+      renderDynamicKioskForm(fields);
+    })
+    .catch(err => {
+      console.error(err);
+      formContainer.innerHTML = '<p class="text-danger">Failed to load form.</p>';
+    });
+}
+
 
 
 
@@ -640,337 +736,63 @@ let _keyboardKeyHandler = null;
 let _focusInHandler = null;
 let _focusOutHandler = null;
 
+/* =========================================================
+   ATTACH VALIDATION TO DYNAMIC FORM
+========================================================= */
 function initFormBehaviors() {
-  const activeForm = document.getElementById('activeForm');
-  if (!activeForm) return;
+  const formEl = document.getElementById('activeForm');
+  if (!formEl) return;
 
-  // Remove potential previous listeners before re-binding (idempotent)
-  // remove document click handler if present
-  if (_globalDocClickHandler) {
-    document.removeEventListener('mousedown', _globalDocClickHandler);
-    _globalDocClickHandler = null;
-  }
+  // Remove old listeners safely
+  const cleanForm = formEl.cloneNode(true);
+  formEl.replaceWith(cleanForm);
 
-  if (_keyboardKeyHandler) {
-    // remove handlers from existing keys
-    document.querySelectorAll('.key').forEach(btn => btn.removeEventListener('click', _keyboardKeyHandler));
-    _keyboardKeyHandler = null;
-  }
-  if (_focusInHandler) {
-    document.removeEventListener('focusin', _focusInHandler);
-    _focusInHandler = null;
-  }
-  if (_focusOutHandler) {
-    document.removeEventListener('focusout', _focusOutHandler);
-    _focusOutHandler = null;
-  }
-
-  // uppercase for elements with class uppercase-required or uppercase-optional
-  document.querySelectorAll('.uppercase-required, .uppercase-optional').forEach(inp => {
-    inp.removeEventListener('input', toUpperHandler);
-    inp.addEventListener('input', toUpperHandler);
+  cleanForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    validateAndConfirm(cleanForm);
   });
-
-  // Use focusin/focusout (bubbles) to reliably detect focus across re-renders
-  _focusInHandler = (e) => {
-    const el = e.target;
-    if (el.matches && (el.matches('input') || el.matches('textarea'))) {
-      currentInput = el;
-      // ensure keyboard visible
-      keyboard.style.display = 'block';
-    }
-  };
-  document.addEventListener('focusin', _focusInHandler);
-
-  _focusOutHandler = (e) => {
-    // If focus moves to an element inside the keyboard, keep it open.
-    // We'll rely on the global doc click to hide the keyboard only when clicking outside both keyboard and form.
-    // Do nothing here.
-  };
-  document.addEventListener('focusout', _focusOutHandler);
-
-  // Global hide handler — use mousedown and check activeElement to avoid races/blinks
-  _globalDocClickHandler = (e) => {
-    const target = e.target;
-
-    // keep keyboard open if interacting with keyboard or form
-    if (keyboard.contains(target)) return;
-    if (activeForm && activeForm.contains(target)) return;
-
-    // If an input inside the form is currently focused, do not hide (avoids race when focus changes)
-    const active = document.activeElement;
-    if (active && activeForm && activeForm.contains(active) &&
-      (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
-      return;
-    }
-
-    // Otherwise hide keyboard
-    keyboard.style.display = 'none';
-    keyboard.setAttribute('aria-hidden', 'true');
-    currentInput = null;
-  };
-
-  // listen on mousedown instead of click to avoid event-order races
-  document.addEventListener('mousedown', _globalDocClickHandler);
-
-
-  // Handle key clicks for on-screen keyboard (single attached handler reused)
-  _keyboardKeyHandler = function (ev) {
-    ev.preventDefault();
-    if (!currentInput) {
-      // optional: flash keyboard or focus first input
-      return;
-    }
-
-    const key = this.getAttribute('data-key');
-    // put caret at current selection end if possible
-    try {
-      currentInput.focus();
-      const start = currentInput.selectionStart ?? currentInput.value.length;
-      const end = currentInput.selectionEnd ?? start;
-      if (key === 'Space') {
-        // insert a space at caret
-        const before = currentInput.value.slice(0, start);
-        const after = currentInput.value.slice(end);
-        currentInput.value = before + ' ' + after;
-        const newPos = start + 1;
-        currentInput.setSelectionRange(newPos, newPos);
-      } else if (key === 'Delete') {
-        // delete before caret
-        if (start === end && start > 0) {
-          const before = currentInput.value.slice(0, start - 1);
-          const after = currentInput.value.slice(end);
-          currentInput.value = before + after;
-          const newPos = start - 1;
-          currentInput.setSelectionRange(newPos, newPos);
-        } else {
-          // replace selected text
-          const before = currentInput.value.slice(0, start);
-          const after = currentInput.value.slice(end);
-          currentInput.value = before + after;
-          currentInput.setSelectionRange(start, start);
-        }
-      } else {
-        const ch = key;
-        const before = currentInput.value.slice(0, start);
-        const after = currentInput.value.slice(end);
-        currentInput.value = before + ch + after;
-        const newPos = start + ch.length;
-        currentInput.setSelectionRange(newPos, newPos);
-      }
-
-      // if input should be uppercase, trigger handler to normalize (keeps selection)
-      if (currentInput.classList.contains('uppercase-required') || currentInput.classList.contains('uppercase-optional')) {
-        // call toUpperHandler manually to preserve caret
-        const fakeEvent = { target: currentInput };
-        toUpperHandler(fakeEvent);
-      }
-      // ensure keyboard remains visible and input stays focused
-      keyboard.style.display = 'block';
-      currentInput.focus();
-    } catch (err) {
-      console.warn('Keyboard interaction error:', err);
-    }
-  };
-
-  document.querySelectorAll('.key').forEach(button => {
-    // remove previous listener just in case (safe)
-    button.removeEventListener('click', _keyboardKeyHandler);
-    button.addEventListener('click', _keyboardKeyHandler);
-  });
-  // mic button toggle (visual only - you can hook real recognition later)
-  const mic = document.getElementById('micBtn');
-  if (mic) {
-    mic.removeEventListener('click', mic._handler);
-    mic._handler = function () {
-      mic.classList.toggle('active');
-      // optional UI feedback: keep keyboard visible when mic active
-      keyboard.style.display = 'block';
-      // you can add actual speech-to-text start/stop here later
-    };
-    mic.addEventListener('click', mic._handler);
-  }
-
-
-  // numeric-only + auto-format for PH mobile number (10 digits, displayed as "xxx xxx xxxx")
-  const contact = activeForm.querySelector('input[name="contactNum"]');
-  if (contact) {
-    // remove any previous handlers if present
-    if (contact._phHandler) contact.removeEventListener('input', contact._phHandler);
-    if (contact._pasteHandler) contact.removeEventListener('paste', contact._pasteHandler);
-
-    contact._phHandler = function (e) {
-      // keep only digits, max 10
-      const raw = e.target.value.replace(/\D/g, '').slice(0, 10);
-      const formatted = formatPHNumber(raw);
-      // set the formatted value and move caret to end (simple, robust)
-      e.target.value = formatted;
-    };
-    contact.addEventListener('input', contact._phHandler);
-
-    // optional: prevent paste from inserting non-digit content
-    contact._pasteHandler = function (ev) {
-      ev.preventDefault();
-      const txt = (ev.clipboardData || window.clipboardData).getData('text') || '';
-      const digits = txt.replace(/\D/g, '').slice(0, 10);
-      contact.value = formatPHNumber(digits);
-    };
-    contact.addEventListener('paste', contact._pasteHandler);
-  }
-
-  // ---------- construction spec toggle (enable spec input when checkbox checked) ----------
-  const consChecks = activeForm.querySelectorAll('.cons-check');
-  consChecks.forEach(cb => {
-    const formCheckBlock = cb.closest('.form-check');
-    const spec = formCheckBlock ? formCheckBlock.querySelector('.cons-spec') : null;
-    if (!spec) return;
-
-    // initial state
-    spec.disabled = !cb.checked;
-    if (!cb.checked) {
-      spec.value = '';
-      spec.removeAttribute('name');
-      spec.required = false;
-    } else {
-      spec.setAttribute('name', `${cb.id}Spec`);
-      spec.required = false; // change to true if you want it mandatory when checked
-    }
-
-    // remove previous handler if present
-    if (cb._consHandler) cb.removeEventListener('change', cb._consHandler);
-
-    cb._consHandler = function () {
-      if (cb.checked) {
-        spec.disabled = false;
-        spec.setAttribute('name', `${cb.id}Spec`);
-        spec.required = false; // set true if you want required
-        // optional: focus the newly enabled field
-        // spec.focus();
-      } else {
-        spec.disabled = true;
-        spec.required = false;
-        spec.removeAttribute('name');
-        spec.value = '';
-      }
-    };
-
-    cb.addEventListener('change', cb._consHandler);
-  });
-
-  // handle form submit
-  // remove previous submit listeners by cloning node (safe)
-  activeForm.removeEventListener('submit', handleFormSubmitWrapped);
-  activeForm.addEventListener('submit', handleFormSubmitWrapped);
-
-
-  // auto-age wiring
-  wireAutoAge();
-
-
-  // clean previous invalid highlights
-  activeForm.querySelectorAll('.is-required-invalid').forEach(el => el.classList.remove('is-required-invalid'));
 }
 
-// we wrap the original handleFormSubmit to allow removing the listener easily
-function handleFormSubmitWrapped(ev) {
-  ev.preventDefault();
-  handleFormSubmit(ev.currentTarget);
-}
-
-// ---------- Form Submit Validation (unchanged logic, minor cleanup) ----------
-function handleFormSubmit(formEl) {
+/* =========================================================
+   VALIDATION + CONFIRMATION
+========================================================= */
+function validateAndConfirm(formEl) {
+  const invalids = [];
   const errorNode = formEl.querySelector('#formError');
+
   if (errorNode) errorNode.style.display = 'none';
 
-  // validation: required fields (HTML5 required coverage) + extra rules
-  const elements = Array.from(formEl.elements).filter(el => el.name);
-  const invalids = [];
-
-  // 1) basic required check
-  elements.forEach(el => {
-    unmarkInvalid(el);
-    const required = el.hasAttribute('required');
-    const value = (el.type === 'checkbox' || el.type === 'radio') ? (el.checked ? (el.value || true) : '') : (el.value ?? '').toString().trim();
-
-    if (required) {
-      if ((el.type === 'radio')) {
-        const radios = formEl.querySelectorAll(`input[name="${el.name}"]`);
-        if (radios.length && !Array.from(radios).some(r => r.checked)) {
-          invalids.push(radios[0]);
-          radios.forEach(r => markInvalid(r));
-        }
-      } else if (el.type === 'checkbox') {
-        if (!el.checked && required) {
-          invalids.push(el);
-          markInvalid(el);
-        }
-      } else {
-        if (!value) {
-          invalids.push(el);
-          markInvalid(el);
-        }
-      }
-    }
-  });
-
-  // ---------- additional validation: TYPE OF CONSTRUCTION (Form 2 - Construction) ----------
-  // run this after the basic required-check loop and before the invalids early return
-  const consContainer = formEl.querySelector('#constructionTypes');
-  if (consContainer) {
-    const checks = Array.from(consContainer.querySelectorAll('.cons-check'));
-    // if there are no checkboxes found, skip
-    if (checks.length) {
-      const anyChecked = checks.some(c => c.checked);
-      if (!anyChecked) {
-        // no selection -> force user to choose one
-        invalids.push(checks[0]);
-        checks.forEach(c => markInvalid(c));
-      } else {
-        // for each checked checkbox, ensure its spec input (if present) is filled
-        for (const c of checks) {
-          if (!c.checked) continue;
-          const block = c.closest('.form-check');
-          const spec = block ? block.querySelector('.cons-spec') : null;
-          // if spec exists and is enabled, require a non-empty value
-          if (spec) {
-            const val = (spec.value ?? '').toString().trim();
-            if (!val) {
-              invalids.push(spec);
-              markInvalid(spec);
-            } else {
-              unmarkInvalid(spec);
-            }
-          }
-        }
-      }
-    }
-  }
-  // ---------- date validation: no future dates allowed + birthday min-age ----------
+  // ---------- DATE VALIDATION ----------
   const today = new Date();
   const dateInputs = Array.from(formEl.querySelectorAll('input[type="date"]'));
+
   dateInputs.forEach(di => {
     if (!di.value) return;
-    // Use midnight for safe comparison
-    const v = new Date(di.value + 'T00:00:00');
-    if (v > today) {
-      invalids.push(di);
-      markInvalid(di);
+    // Parse m/d/Y safely (Flatpickr format)
+    const parts = di.value.split('/');
+    if (parts.length === 3) {
+      const v = new Date(
+        Number(parts[2]),        // year
+        Number(parts[0]) - 1,    // month (0-based)
+        Number(parts[1])         // day
+      );
+
+      if (!isNaN(v) && v > today) {
+        invalids.push(di);
+        markInvalid(di);
+      }
     }
   });
 
-  // ensure birthday corresponds to at least 8 years old
+  // ---------- BIRTHDAY / AGE CHECK ----------
   const bdayEl = formEl.querySelector('#bday');
   if (bdayEl && bdayEl.value) {
     const age = computeAgeFromDOB(bdayEl.value);
-    // computeAgeFromDOB returns '' for invalid/future date — treat as invalid
     if (age === '' || age < 8) {
       invalids.push(bdayEl);
       markInvalid(bdayEl);
     }
   }
-
-
-
 
   if (invalids.length) {
     if (errorNode) errorNode.style.display = 'block';
@@ -978,94 +800,174 @@ function handleFormSubmit(formEl) {
     return;
   }
 
-  // If passes validation: show confirmation modal
-  const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+  // ---------- CONFIRM MODAL ----------
+  const modalEl = document.getElementById('confirmModal');
+  const confirmModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  console.log('✅ validation passed, showing confirm modal');
+  hideKeyboard();
+  const confirmNo = modalEl.querySelector('#confirmNo');
+  const confirmYes = modalEl.querySelector('#confirmYes');
   confirmModal.show();
 
-  const confirmNo = document.getElementById('confirmNo');
-  const confirmYes = document.getElementById('confirmYes');
-
-  // remove old listeners by cloning
+  // remove old listeners
   confirmNo.replaceWith(confirmNo.cloneNode(true));
   confirmYes.replaceWith(confirmYes.cloneNode(true));
 
-  const newConfirmNo = document.getElementById('confirmNo');
-  const newConfirmYes = document.getElementById('confirmYes');
-
-  newConfirmNo.addEventListener('click', () => {
+  modalEl.querySelector('#confirmNo').addEventListener('click', () => {
     confirmModal.hide();
-    focusFirstInvalid(invalids);  // Revalidate to focus on first invalid field if any
   });
 
-  newConfirmYes.addEventListener('click', () => {
+  modalEl.querySelector('#confirmYes').addEventListener('click', () => {
     confirmModal.hide();
     showSummary(formEl);
   });
 }
 
-// ---------- Summary / Print Modal (unchanged) ----------
+
+/* =========================================================
+   SUMMARY + PRINT
+========================================================= */
 function showSummary(formEl) {
   const ref = randRef();
   const summaryBody = document.getElementById('summaryBody');
   const entries = {};
 
-  // Collect form data for the summary
   Array.from(formEl.elements).forEach(el => {
     if (!el.name) return;
+
     if (el.type === 'checkbox') {
       if (!entries[el.name]) entries[el.name] = [];
       if (el.checked) entries[el.name].push(el.value || 'Yes');
     } else if (el.type === 'radio') {
       if (el.checked) entries[el.name] = el.value;
-      else if (!entries[el.name]) entries[el.name] = '';
     } else {
       entries[el.name] = el.value ?? '';
     }
   });
 
-  // Normalize contact display: if contactNum exists, ensure it's shown as "+63 xxx xxx xxxx"
-  if (entries.contactNum) {
-    const digits = String(entries.contactNum).replace(/\D/g, '').slice(0, 10);
-    const formatted = digits ? formatPHNumber(digits) : '';
-    entries.contactNum = formatted ? `+63 ${formatted}` : '';
-  }
+  const selectedText =
+    requestTypeSelect.options[requestTypeSelect.selectedIndex]?.text || '';
 
-  const selectedRequestText = requestTypeSelect.options[requestTypeSelect.selectedIndex].text;
-
-  let html = `<p><strong>Request Type:</strong> ${selectedRequestText}</p>
-              <p><strong>Reference Number:</strong> ${ref}</p><hr>`;
+  let html = `
+    <p><strong>Request Type:</strong> ${selectedText}</p>
+    <p><strong>Reference Number:</strong> ${ref}</p>
+    <hr>
+  `;
 
   for (const [k, v] of Object.entries(entries)) {
-    let displayVal = Array.isArray(v) ? v.join(', ') : v;
-    if (displayVal === '') displayVal = '<em>(blank)</em>';
-    html += `<div class="col-md-6 mb-2"><strong>${k}:</strong> ${displayVal}</div>`;
+    const displayVal = Array.isArray(v) ? v.join(', ') : (v || '<em>(blank)</em>');
+    html += `<p><strong>${k}:</strong> ${displayVal}</p>`;
   }
 
   summaryBody.innerHTML = html;
 
-  const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
+  const summaryModal = new bootstrap.Modal(
+    document.getElementById('summaryModal')
+  );
   summaryModal.show();
 
   const printBtn = document.getElementById('printReceiptBtn');
-  const newPrint = printBtn.cloneNode(true);
-  printBtn.replaceWith(newPrint);
+  const cleanPrint = printBtn.cloneNode(true);
+  printBtn.replaceWith(cleanPrint);
 
-  newPrint.addEventListener('click', () => {
+  cleanPrint.addEventListener('click', () => {
     document.getElementById('printingOverlay').style.display = 'flex';
     setTimeout(() => {
       document.getElementById('printingOverlay').style.display = 'none';
       summaryModal.hide();
-      window.location.href = 'index.html'; // Redirect to index.html
+      window.location.href = '../index.html';
       formEl.reset();
-      console.log('Submission printed. Reference:', ref);
     }, 3000);
   });
 }
 
+
+
+function renderDynamicKioskForm(fields) {
+  const form = document.createElement('form');
+  form.id = 'activeForm';
+  form.noValidate = true;
+
+  fields.forEach(f => {
+    const group = document.createElement('div');
+    group.className = 'mb-3';
+
+    const label = document.createElement('label');
+    label.className = 'form-label';
+    label.textContent = f.label;
+
+    let input;
+
+    if (f.field_type === 'textarea') {
+      input = document.createElement('textarea');
+      input.rows = 3;
+    } else {
+      input = document.createElement('input');
+      input.type = f.field_type;
+    }
+
+    input.name = f.field_key;
+    input.className = 'form-control';
+    input.autocomplete = 'off';
+
+    if (f.is_required == 1) {
+      input.required = true;
+    }
+
+    group.append(label, input);
+    form.appendChild(group);
+  });
+
+  const btn = document.createElement('button');
+  btn.type = 'submit';
+  btn.className = 'btn btn-primary w-100 mt-3';
+  btn.textContent = 'Submit Request';
+
+  form.appendChild(btn);
+
+  formContainer.innerHTML = '';
+  formContainer.appendChild(form);
+
+  // 🔥 reuse what already works
+  initFormBehaviors();
+  wireOnScreenKeyboard();
+  initializeDatePickers();
+}
+
+
+
+
+
+
+
+
+
+
 // ---------- startup ----------
 // requestTypeSelect.addEventListener('change', renderSelectedForm);
-document.getElementById('backBtn').addEventListener('click', () => {
-  window.location.href = '../index.html';
+document.addEventListener('DOMContentLoaded', () => {
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      window.location.href = '../index.html';
+    });
+  }
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  keyboard = document.getElementById('keyboard');
+
+  if (!keyboard) {
+    console.error('❌ keyboard element not found');
+  }
+
+  keyboard.addEventListener('mousedown', (e) => {
+    e.stopPropagation();
+  });
+
+  wireKeyboardKeys();
+  enableKeyboardAutoHide();
 });
 
 // initial render
@@ -1083,6 +985,10 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ script.js connected on request page');
 
   requestTypeSelect.addEventListener('change', renderSelectedForm);
+
+  if (requestTypeSelect.value) {
+    renderSelectedForm();
+  }
 });
 
 
