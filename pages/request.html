@@ -14,7 +14,6 @@
 
 
   <!-- Your custom stylesheet -->
-  <link rel="stylesheet" href="../CSS/keyboard.css" />
   <link rel="stylesheet" href="../CSS/request.css" />
 
   <style>
@@ -34,39 +33,6 @@
       color: #fff;
       z-index: 1080;
       font-size: 1.1rem;
-    }
-
-    /* Basic styles for the keyboard */
-    .keyboard {
-      display: none;
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #fff;
-      border: 1px solid #ccc;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-    }
-
-    .keyboard button {
-      padding: 10px;
-      font-size: 18px;
-      margin: 5px;
-      border: none;
-      background-color: #f1f1f1;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .keyboard button:hover {
-      background-color: #ddd;
-    }
-
-    .keyboard button:focus {
-      outline: none;
     }
 
     /* Styles for the microphone button */
@@ -126,72 +92,6 @@
       <button class="btn btn-outline-primary px-4" id="backBtn">← Back to Home</button>
     </div>
   </div>
-
-  <!-- On-screen keyboard (new layout) -->
-   
-  <!-- <div class="keyboard" id="keyboard" aria-hidden="true"> -->
-    <!-- Row 1: Numbers -->
-    <!-- <div class="kbd-row" role="group" aria-label="numbers">
-      <button class="key" data-key="1">1</button>
-      <button class="key" data-key="2">2</button>
-      <button class="key" data-key="3">3</button>
-      <button class="key" data-key="4">4</button>
-      <button class="key" data-key="5">5</button>
-      <button class="key" data-key="6">6</button>
-      <button class="key" data-key="7">7</button>
-      <button class="key" data-key="8">8</button>
-      <button class="key" data-key="9">9</button>
-      <button class="key" data-key="0">0</button>
-    </div> -->
-
-    <!-- Row 2: QWERTYUIOP -->
-    <!-- <div class="kbd-row" role="group" aria-label="row two">
-      <button class="key" data-key="Q">Q</button>
-      <button class="key" data-key="W">W</button>
-      <button class="key" data-key="E">E</button>
-      <button class="key" data-key="R">R</button>
-      <button class="key" data-key="T">T</button>
-      <button class="key" data-key="Y">Y</button>
-      <button class="key" data-key="U">U</button>
-      <button class="key" data-key="I">I</button>
-      <button class="key" data-key="O">O</button>
-      <button class="key" data-key="P">P</button>
-    </div> -->
-
-    <!-- Row 3: ASDFGHJKL -->
-    <!-- <div class="kbd-row" role="group" aria-label="row three">
-      <button class="key" data-key="A">A</button>
-      <button class="key" data-key="S">S</button>
-      <button class="key" data-key="D">D</button>
-      <button class="key" data-key="F">F</button>
-      <button class="key" data-key="G">G</button>
-      <button class="key" data-key="H">H</button>
-      <button class="key" data-key="J">J</button>
-      <button class="key" data-key="K">K</button>
-      <button class="key" data-key="L">L</button>
-    </div> -->
-
-    <!-- Row 4: ZXCVBNM -->
-    <!-- <div class="kbd-row" role="group" aria-label="row four">
-      <button class="key" data-key="Z">Z</button>
-      <button class="key" data-key="X">X</button>
-      <button class="key" data-key="C">C</button>
-      <button class="key" data-key="V">V</button>
-      <button class="key" data-key="B">B</button>
-      <button class="key" data-key="N">N</button>
-      <button class="key" data-key="M">M</button>
-    </div> -->
-
-
-    <!-- Row 5: space, delete, mic -->
-    <!-- <div class="kbd-row kbd-row-bottom" role="group" aria-label="controls">
-      <button class="key wide" data-key="Space">Space</button>
-      <button class="key" data-key="Delete">Del</button>
-      <button id="micBtn" class="mic-btn" type="button" title="Voice input">🎤</button>
-    </div>
-  </div> -->
-  <!-- end of keyboard -->
-
 
   <!-- Confirmation modal -->
   <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
