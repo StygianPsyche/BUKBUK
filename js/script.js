@@ -2,8 +2,6 @@
 let requestTypeSelect;
 let formContainer;
 
-let keyboard = null;
-
 let currentInput = null;
 
 let _bdayChangeHandler = null;
@@ -526,92 +524,6 @@ const TEMPLATE_REGISTRY = {
 };
 
 /* =========================================================
-   SHOW KEYBOARD
-========================================================= */
-function isMobileOrTablet() {
-  return window.matchMedia('(max-width: 768px)').matches;
-}
-
-
-
-
-
-function showKeyboardForInput(input) {
-  if (isMobileOrTablet()) return;
-  if (!keyboard) return;
-
-  currentInput = input;
-  keyboard.style.display = 'block';
-  keyboard.setAttribute('aria-hidden', 'false');
-}
-
-function wireKeyboardKeys() {
-  const keys = keyboard.querySelectorAll('.key');
-
-  keys.forEach(key => {
-    key.addEventListener('mousedown', (e) => {
-      e.preventDefault();      // stop focus loss
-      e.stopPropagation();     // stop auto-hide
-
-      if (!currentInput) return;
-
-      const value = key.dataset.key;
-
-      if (value === 'Delete') {
-        currentInput.value = currentInput.value.slice(0, -1);
-      } else if (value === 'Space') {
-        currentInput.value += ' ';
-      } else {
-        currentInput.value += value;
-      }
-
-      currentInput.dispatchEvent(
-        new Event('input', { bubbles: true })
-      );
-    });
-  });
-}
-
-function hideKeyboard() {
-  if (!keyboard) return;
-
-  keyboard.style.display = 'none';
-  keyboard.setAttribute('aria-hidden', 'true');
-  currentInput = null;
-}
-
-
-function enableKeyboardAutoHide() {
-  document.addEventListener('mousedown', (e) => {
-    if (!keyboard || !currentInput) return;
-
-    const clickedInsideKeyboard = keyboard.contains(e.target);
-    const clickedInput = e.target === currentInput;
-
-    if (!clickedInsideKeyboard && !clickedInput) {
-      hideKeyboard();
-    }
-  });
-}
-
-
-
-function wireOnScreenKeyboard() {
-  if (isMobileOrTablet()) return;
-
-  const inputs = document.querySelectorAll(
-    '#formContainer input, #formContainer textarea'
-  );
-
-  inputs.forEach(input => {
-    input.addEventListener('focus', () => {
-      showKeyboardForInput(input);
-    });
-  });
-}
-
-
-/* =========================================================
    RENDER FORM BASED ON SELECT
 ========================================================= */
 function renderSelectedForm() {
@@ -633,10 +545,6 @@ function renderSelectedForm() {
       formContainer.innerHTML = '<p class="text-danger">Failed to load form.</p>';
     });
 }
-
-
-
-
 
 // ---------- Auto-age calculation from birthday ----------
 function computeAgeFromDOB(dobString) {
@@ -729,21 +637,8 @@ function wireAutoAge() {
   bday.addEventListener('input', _bdayChangeHandler);
   age.addEventListener('input', _ageInputHandler);
 }
-
-// format raw digits (10) into "xxx xxx xxxx"
-function formatPHNumber(digits) {
-  // remove non-digits just in case
-  const d = (digits || '').replace(/\D/g, '').slice(0, 10);
-  if (!d) return '';
-  if (d.length <= 3) return d;
-  if (d.length <= 6) return `${d.slice(0, 3)} ${d.slice(3)}`;
-  return `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}`;
-}
-
-
 // ---------- Form Behaviors (fixed) ----------
 let _globalDocClickHandler = null;
-let _keyboardKeyHandler = null;
 let _focusInHandler = null;
 let _focusOutHandler = null;
 
@@ -815,7 +710,6 @@ function validateAndConfirm(formEl) {
   const modalEl = document.getElementById('confirmModal');
   const confirmModal = bootstrap.Modal.getOrCreateInstance(modalEl);
   console.log('✅ validation passed, showing confirm modal');
-  hideKeyboard();
   const confirmNo = modalEl.querySelector('#confirmNo');
   const confirmYes = modalEl.querySelector('#confirmYes');
   confirmModal.show();
@@ -892,8 +786,6 @@ function showSummary(formEl) {
   });
 }
 
-
-
 function renderDynamicKioskForm(fields) {
   const form = document.createElement('form');
   form.id = 'activeForm';
@@ -941,7 +833,6 @@ function renderDynamicKioskForm(fields) {
 
   // 🔥 reuse what already works
   initFormBehaviors();
-  wireOnScreenKeyboard();
   initializeDatePickers();
 }
 
@@ -956,25 +847,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  keyboard = document.getElementById('keyboard');
-
-  if (!keyboard) {
-    console.error('❌ keyboard element not found');
-  }
-
-  keyboard.addEventListener('mousedown', (e) => {
-    e.stopPropagation();
-  });
-
-  wireKeyboardKeys();
-  enableKeyboardAutoHide();
-});
-
-// initial render
-
 
 document.addEventListener('DOMContentLoaded', () => {
   requestTypeSelect = document.getElementById('requestTypeSelect');
@@ -1045,6 +917,5 @@ function renderDynamicKioskForm(fields) {
 
   // 🔥 reuse your existing, working logic
   initFormBehaviors();
-  wireOnScreenKeyboard();
   initializeDatePickers();
 }
