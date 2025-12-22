@@ -2,56 +2,47 @@
    🌿 STATUS PAGE — Kiosk-Ready Green Theme
    Elderly-Accessible Version (1080x1920)
    ========================================= */
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
 
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
   background: linear-gradient(160deg, #2e8b57, #3cb371, #00b37a);
   color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   text-align: center;
-  overflow: hidden;
-  font-size: 2.2rem;
-  line-height: 1.8;
+  min-height: auto;
+  overflow-y: auto;
+  /* font-size: clamp(14px, 1.2vw, 20px); */
 }
 
+
 /* Form container */
-/* Default (desktop kiosk) */
 #formContainer {
-  max-height: calc(100vh - 260px);
+  max-height: none;
+  overflow: visible;
+  padding: 1rem;
 }
+
+
 
 /* Tablets */
 @media (max-width: 1024px) {
   #formContainer {
-    max-height: calc(100vh - 220px);
+    max-height: none;
+    overflow: visible;
+    padding: 1rem;
   }
+
 }
 
-/* Phones */
-@media (max-width: 768px) {
-  #formContainer {
-    max-height: calc(100vh - 180px);
-    padding-bottom: 200px;
-    /* smaller keyboard */
-  }
-}
-
-/* Hide kiosk keyboard on phones */
-@media (max-width: 768px) {
-  .keyboard {
-    display: none !important;
-  }
-}
-
-
+/* 
 #formContainer {
   max-height: calc(100vh - 250px);
-  /* adjust based on header + buttons */
+   adjust based on header + buttons 
   overflow-y: auto;
   padding: 1rem;
   box-sizing: border-box;
@@ -59,31 +50,17 @@ body {
 
 #formContainer {
   padding-bottom: 280px;
-  /* height of on-screen keyboard */
+   height of on-screen keyboard 
 }
 
 #formContainer {
   scroll-behavior: smooth;
-}
+} */
 
 input,
 select,
 textarea {
   font-size: 1rem;
-}
-
-@media (max-width: 768px) {
-
-  input,
-  select,
-  textarea {
-    font-size: 1.1rem;
-  }
-
-  button {
-    font-size: 1.1rem;
-    padding: 0.75rem;
-  }
 }
 
 .modal-dialog {
@@ -252,101 +229,35 @@ textarea {
 }
 
 /* ==============================
-   On-screen Keyboard
+   Responsive Tweaks
    ============================== */
-/* Hide kiosk keyboard on phones & tablets */
-@media (max-width: 768px) {
-  #keyboard {
-    display: none !important;
+/* ===============================
+   💻 NORMAL DESKTOP / LAPTOP
+=============================== */
+@media (max-width: 1400px) {
+
+  .status-section h4,
+  .input-section h5 {
+    font-size: 2rem;
+  }
+
+  .info-box p {
+    font-size: 1.2rem;
+  }
+
+  #refInput {
+    height: 90px;
+    font-size: 1.6rem;
+  }
+
+  .btn-custom,
+  .btn-outline-primary {
+    font-size: 1.5rem;
+    padding: 16px 32px;
   }
 }
 
 
-#keyboard {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
-  padding: 35px;
-  z-index: 1000;
-}
-
-#keyboardLayout {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 35px;
-  justify-items: center;
-  padding: 15px;
-}
-
-.keyboard-button {
-  padding: 35px;
-  font-size: 3rem;
-  font-weight: bold;
-  border-radius: 20px;
-  border: none;
-  background: linear-gradient(135deg, #ffffff, #f3f3f3);
-  color: #2e8b57;
-  width: 95%;
-  max-width: 280px;
-  height: 130px;
-  display: flex;
-  /* use flexbox */
-  align-items: center;
-  /* vertical center */
-  justify-content: center;
-  /* horizontal center */
-  transition: all 0.2s ease;
-  text-align: center;
-  /* fallback text center */
-}
-
-
-.keyboard-button:hover {
-  transform: scale(1.05);
-  background: linear-gradient(135deg, #f9f9f9, #ffffff);
-}
-
-.keyboard-button:active {
-  transform: scale(0.96);
-  background: #e0e0e0;
-}
-
-[data-key="clear"] {
-  background: #ffd54f;
-  color: #333;
-}
-
-[data-key="enter"] {
-  background: #2e8b57;
-  color: #fff;
-}
-
-/* Mic Button */
-.mic-btn {
-  font-size: 4rem;
-  border: none;
-  background: linear-gradient(135deg, #3cb371, #00b37a);
-  color: white;
-  border-radius: 50%;
-  padding: 30px;
-  cursor: pointer;
-  transition: transform 0.3s ease, background 0.3s ease;
-  box-shadow: 0 6px 25px rgba(60, 179, 113, 0.6);
-}
-
-.mic-btn.active {
-  background: linear-gradient(135deg, #43cea2, #2e8b57);
-  transform: scale(1.15);
-  box-shadow: 0 0 30px rgba(0, 255, 128, 0.6);
-}
-
-/* ==============================
-   Responsive Tweaks
-   ============================== */
 @media (max-width: 1080px) {
 
   .status-section h4,
@@ -374,26 +285,6 @@ textarea {
   .keyboard-button {
     font-size: 2.6rem;
     height: 110px;
-  }
-}
-
-
-@media (max-width: 768px) {
-  body {
-    overflow-y: auto;
-    align-items: flex-start;
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 768px) {
-  body {
-    font-size: 1.4rem;
-    line-height: 1.5;
-  }
-
-  .info-box p {
-    font-size: 1.3rem;
   }
 }
 
@@ -458,6 +349,5 @@ textarea {
 }
 
 .status-page {
-  min-height: 100vh;
-  background: linear-gradient(180deg, #2f8f5b, #3aa76d);
+  min-height: auto;
 }
