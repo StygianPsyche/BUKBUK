@@ -10,12 +10,12 @@ body {
   background: linear-gradient(160deg, #2e8b57, #3cb371, #00b37a);
   color: #fff;
   min-height: 100vh;
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
-  justify-content: flex-start; /* top-aligned */
-  align-items: stretch;        /* full width */
+  /* justify-content: flex-start; top-aligned */
+  /* align-items: stretch;        full width */
   text-align: left;            /* left-aligned text */
-  overflow: hidden;
+  overflow-y: auto;
   font-size: 2.2rem;
   line-height: 1.8;
   padding: 20px;
@@ -55,8 +55,12 @@ textarea {
   }
 }
 
+.formContainer {
+  display: none;
+}
+
 .modal-dialog {
-  margin: 1rem;
+  margin: auto;
 }
 
 
