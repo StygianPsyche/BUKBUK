@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   const select = document.getElementById("requestTypeSelect");
+  const formContainer = document.getElementById("formContainer");
 
   if (!select) {
     console.error("❌ Select not found");
@@ -7,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   fetch("../api/request_types.php")
+
     .then(response => response.json())
     .then(data => {
       console.log("✅ Loaded request types:", data);
@@ -24,9 +26,22 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("❌ Failed to load request types", error);
     });
 
+
+
   select.addEventListener("change", () => {
     const requestTypeId = select.value;
-    if (!requestTypeId) return;
+
+    // ❌ No request selected → hide form
+    if (!requestTypeId) {
+      formContainer.innerHTML = "";
+      formContainer.style.display = "none";
+      console.log("🧹 No request selected, form hidden");
+      return;
+    }
+
+    // ✅ Request selected → show form
+    formContainer.style.display = "block";
+    formContainer.innerHTML = ""; // clear previous form
 
     console.log("📌 Selected request type ID:", requestTypeId);
 
