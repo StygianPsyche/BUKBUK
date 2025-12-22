@@ -21,41 +21,6 @@ body {
   padding: 20px;
 }
 
-
-
-
-/* Form container */
-/* Default (desktop kiosk) */
-#formContainer {
-  max-height: calc(100vh - 260px);
-}
-
-/* Tablets */
-@media (max-width: 1024px) {
-  #formContainer {
-    max-height: calc(100vh - 220px);
-  }
-}
-
-/* ==============================
-   KIOSK KEYBOARD VISIBILITY
-============================== */
-
-/* Hide kiosk keyboard on tablets and phones */
-@media (max-width: 1024px) {
-  .keyboard {
-    display: none !important;
-  }
-}
-
-/* Show kiosk keyboard only on large screens */
-@media (min-width: 1025px) {
-  .keyboard {
-    display: block;
-  }
-}
-
-
 #formContainer {
   max-height: calc(100vh - 250px); /* adjust based on header + buttons */
   overflow-y: auto;
