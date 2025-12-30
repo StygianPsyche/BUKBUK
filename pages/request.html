@@ -21,6 +21,7 @@
   </div>
 
   <div class="container py-5 position-relative" style="z-index:1;">
+
     <!-- Request Type -->
     <div class="card p-4 mb-4">
       <h5 class="fw-bold mb-3">Request Type</h5>
@@ -32,7 +33,7 @@
     </div>
 
     <!-- ID Question -->
-    <div class="card p-4" id="idQuestion" style="display:none;">
+    <div class="card p-4 mb-4" id="idQuestion" style="display:none;">
       <h5 class="fw-bold mb-3">Do you have a valid ID?</h5>
 
       <div class="form-check mb-2">
@@ -49,6 +50,14 @@
         Next
       </button>
     </div>
+
+    <!-- Back to Home -->
+    <div class="text-center">
+      <button class="btn btn-outline-primary btn-lg" onclick="window.location.href='index.html'">
+        ← Back to Home
+      </button>
+    </div>
+
   </div>
 
   <script>
@@ -68,7 +77,10 @@
 
     nextBtn.addEventListener("click", () => {
       const hasId = document.querySelector('input[name="hasId"]:checked').value;
-      window.location.href = `scanner.html?hasId=${hasId}`;
+      const requestType = requestTypeSelect.value;
+
+      window.location.href =
+        `scanner.html?hasId=${hasId}&type=${requestType}`;
     });
   </script>
 

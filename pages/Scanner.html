@@ -22,7 +22,7 @@
 
   <div class="container py-5 position-relative" style="z-index:1;">
 
-    <!-- SCANNER -->
+    <!-- SCANNER (conditional) -->
     <div id="scannerSection" class="mb-4">
       <div class="card p-4 text-center">
         <h5 class="fw-bold mb-3">Scan Your ID</h5>
@@ -32,8 +32,8 @@
       </div>
     </div>
 
-    <!-- FORM (MOVED FROM REQUEST.HTML) -->
-    <div class="card p-4">
+    <!-- FORM -->
+    <div class="card p-4 mb-4">
       <h5 class="fw-bold mb-3">Request Form</h5>
 
       <div class="mb-3">
@@ -56,15 +56,31 @@
       </button>
     </div>
 
+    <!-- Back to Home -->
+    <div class="text-center">
+      <button class="btn btn-outline-primary btn-lg" onclick="window.location.href='index.html'">
+        ← Back to Home
+      </button>
+    </div>
+
   </div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
     const hasId = params.get("hasId");
+    const requestType = params.get("type");
 
-    if (hasId === "no") {
-      document.getElementById("scannerSection").style.display = "none";
+    const scannerSection = document.getElementById("scannerSection");
+
+    // Safe default: hide scanner
+    scannerSection.style.display = "none";
+
+    // Show scanner only if has ID
+    if (hasId === "yes") {
+      scannerSection.style.display = "block";
     }
+
+    console.log("Request Type:", requestType);
   </script>
 
 </body>
