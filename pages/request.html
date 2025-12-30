@@ -6,29 +6,22 @@
   <title>Request Form</title>
 
   <!-- Bootstrap -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="../CSS/request.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="CSS/request.css">
 </head>
 
 <body>
+
   <!-- Background -->
   <div class="bg-patterns">
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
-    <div class="shape"></div>
+    <div class="shape"></div><div class="shape"></div><div class="shape"></div>
+    <div class="shape"></div><div class="shape"></div><div class="shape"></div>
+    <div class="shape"></div><div class="shape"></div><div class="shape"></div>
     <div class="shape"></div>
   </div>
 
-  <div class="container py-5 position-relative" style="z-index: 1;">
+  <div class="container py-5 position-relative" style="z-index:1;">
+
     <!-- Request Type -->
     <div class="card p-4 mb-4">
       <h5 class="fw-bold mb-3">Request Type</h5>
@@ -40,41 +33,32 @@
     </div>
 
     <!-- ID Question -->
-    <div class="card p-4 mb-4" id="idQuestion" style="display: none;">
+    <div class="card p-4 mb-4" id="idQuestion" style="display:none;">
       <h5 class="fw-bold mb-3">Do you have a valid ID?</h5>
 
       <div class="form-check mb-2">
-        <input
-          class="form-check-input"
-          type="radio"
-          name="hasId"
-          value="yes"
-        />
+        <input class="form-check-input" type="radio" name="hasId" value="yes">
         <label class="form-check-label">Yes, I have an ID</label>
       </div>
 
       <div class="form-check mb-3">
-        <input
-          class="form-check-input"
-          type="radio"
-          name="hasId"
-          value="no"
-        />
+        <input class="form-check-input" type="radio" name="hasId" value="no">
         <label class="form-check-label">No, I don’t have an ID</label>
       </div>
 
-      <button class="btn btn-primary btn-lg" id="nextBtn" disabled>
+      <button type="button" class="btn btn-primary btn-lg" id="nextBtn" disabled>
         Next
       </button>
     </div>
 
-    <!-- Back to Home -->
-    <button
-      class="btn btn-outline-primary btn-lg"
-      onclick="window.location.href='../index.html'"
-    >
-      ← Back to Home
-    </button>
+    <!-- Back -->
+    <div class="text-center">
+      <button type="button" class="btn btn-outline-primary btn-lg"
+              onclick="window.location.href='index.html'">
+        ← Back to Home
+      </button>
+    </div>
+
   </div>
 
   <script>
@@ -86,22 +70,20 @@
       idQuestion.style.display = requestTypeSelect.value ? "block" : "none";
     });
 
-    document
-      .querySelectorAll('input[name="hasId"]')
-      .forEach((radio) => {
-        radio.addEventListener("change", () => {
-          nextBtn.disabled = false;
-        });
+    document.querySelectorAll('input[name="hasId"]').forEach(radio => {
+      radio.addEventListener("change", () => {
+        nextBtn.disabled = false;
       });
+    });
 
     nextBtn.addEventListener("click", () => {
-      const hasId = document.querySelector(
-        'input[name="hasId"]:checked'
-      ).value;
+      const hasId = document.querySelector('input[name="hasId"]:checked').value;
       const requestType = requestTypeSelect.value;
 
-      window.location.href = `scanner.html?hasId=${hasId}&type=${requestType}`;
+      window.location.href =
+        `scanner.html?hasId=${hasId}&type=${requestType}`;
     });
   </script>
+
 </body>
 </html>
