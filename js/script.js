@@ -811,7 +811,12 @@ function validateAndConfirm(formEl) {
     return;
   }
 
+
+
   // ---------- CONFIRM MODAL ----------
+
+  window._pendingForm = formEl;
+
   const modalEl = document.getElementById('confirmModal');
   const confirmModal = bootstrap.Modal.getOrCreateInstance(modalEl);
   console.log('✅ validation passed, showing confirm modal');
@@ -830,8 +835,10 @@ function validateAndConfirm(formEl) {
 
   modalEl.querySelector('#confirmYes').addEventListener('click', () => {
     confirmModal.hide();
-    showSummary(formEl);
+    submitRequestToSQL();
   });
+
+
 }
 
 
@@ -893,57 +900,6 @@ function showSummary(formEl) {
 }
 
 
-
-function renderDynamicKioskForm(fields) {
-  const form = document.createElement('form');
-  form.id = 'activeForm';
-  form.noValidate = true;
-
-  fields.forEach(f => {
-    const group = document.createElement('div');
-    group.className = 'mb-3';
-
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.textContent = f.label;
-
-    let input;
-
-    if (f.field_type === 'textarea') {
-      input = document.createElement('textarea');
-      input.rows = 3;
-    } else {
-      input = document.createElement('input');
-      input.type = f.field_type;
-    }
-
-    input.name = f.field_key;
-    input.className = 'form-control';
-    input.autocomplete = 'off';
-
-    if (f.is_required == 1) {
-      input.required = true;
-    }
-
-    group.append(label, input);
-    form.appendChild(group);
-  });
-
-  const btn = document.createElement('button');
-  btn.type = 'submit';
-  btn.className = 'btn btn-primary w-100 mt-3';
-  btn.textContent = 'Submit Request';
-
-  form.appendChild(btn);
-
-  formContainer.innerHTML = '';
-  formContainer.appendChild(form);
-
-  // 🔥 reuse what already works
-  initFormBehaviors();
-  wireOnScreenKeyboard();
-  initializeDatePickers();
-}
 
 
 // ---------- startup ----------
