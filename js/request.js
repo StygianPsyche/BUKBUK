@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-
+//para kay kimart
 // document.getElementById("confirmYes").addEventListener("click", () => {
 
 //   const formEl = window._pendingForm;
@@ -122,3 +122,5 @@ function submitRequestToSQL() {
       alert("Failed to submit request");
     });
 }
+
+
