@@ -15,26 +15,26 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   const nextBtn = document.getElementById("nextBtn");
-const idCard = document.querySelector(".id-card");
+  const idCard = document.querySelector(".id-card");
 
-nextBtn.addEventListener("click", () => {
-  const selected = document.querySelector('input[name="hasId"]:checked');
-  if (!selected) return;
+  nextBtn.addEventListener("click", () => {
+    const selected = document.querySelector('input[name="hasId"]:checked');
+    if (!selected) return;
 
-  if (selected.value === "yes") {
-    idCard.innerHTML = `
+    if (selected.value === "yes") {
+      idCard.innerHTML = `
       <div class="text-center">
         <button class="btn btn-primary btn-lg" id="scanBtn">
           📷 Scan ID
         </button>
       </div>
     `;
-  }
+    }
 
-  if (selected.value === "no") {
-    idCard.style.display = "none";
-  }
-});
+    if (selected.value === "no") {
+      idCard.style.display = "none";
+    }
+  });
 
 
   fetch("../api/request_types.php")
@@ -147,4 +147,12 @@ function submitRequestToSQL() {
       console.error("❌ Insert error:", err);
       alert("Failed to submit request");
     });
+}
+
+const confirmYes = document.getElementById("confirmYes");
+
+if (confirmYes) {
+  confirmYes.addEventListener("click", () => {
+    submitRequestToSQL();
+  });
 }

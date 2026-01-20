@@ -614,12 +614,19 @@ function wireOnScreenKeyboard() {
 /* =========================================================
    RENDER FORM BASED ON SELECT
 ========================================================= */
+console.log("Submitting request_type_id:",
+  document.getElementById("requestTypeSelect").value
+);
 function renderSelectedForm() {
   const requestTypeId = requestTypeSelect.value;
   if (!requestTypeId) return;
 
   fetch(`../api/get_request_fields.php?request_type_id=${requestTypeId}`)
-    .then(res => res.json())
+    .then(async res => {
+      const text = await res.text();
+      console.log("RAW RESPONSE:", text);
+      return JSON.parse(text);
+    })
     .then(fields => {
       if (!fields.length) {
         formContainer.innerHTML = '<p class="text-center">No fields configured.</p>';
