@@ -852,8 +852,8 @@ function validateAndConfirm(formEl) {
 /* =========================================================
    SUMMARY + PRINT
 ========================================================= */
-function showSummary(formEl) {
-  const ref = randRef();
+function showSummary(formEl, refNumber) {
+  // const ref = randRef();
   const summaryBody = document.getElementById('summaryBody');
   const entries = {};
 
@@ -875,7 +875,7 @@ function showSummary(formEl) {
 
   let html = `
     <p><strong>Request Type:</strong> ${selectedText}</p>
-    <p><strong>Reference Number:</strong> ${ref}</p>
+    <p><strong>Reference Number:</strong> ${refNumber}</p>
     <hr>
   `;
 
