@@ -1,34 +1,32 @@
 <?php
+ini_set('display_errors', 0);
+error_reporting(0);
 header("Content-Type: application/json");
 
-$conn = new mysqli("153.92.15.84","u279021732_brgyugong","Ds#XH1I#t","u279021732_brgyugong");
+// header("Content-Type: application/json");
+// error_reporting(E_ALL);
+// ini_set('display_errors', 1);
+
+$conn = new mysqli(
+  "153.92.15.84",
+  "u279021732_brgyugong",
+  "Ds#XH1I#t",
+  "u279021732_brgyugong"
+);
 
 if ($conn->connect_error) {
-  echo json_encode([
-    "success" => false,
-    "message" => "Database connection failed"
-  ]);
+  echo json_encode(["success" => false, "message" => "DB connection failed"]);
   exit;
 }
 
-// from kiosk
 $typeId = $_POST['request_type_id'] ?? null;
-
 if (!$typeId) {
-  echo json_encode([
-    "success" => false,
-    "message" => "Missing request type"
-  ]);
+  echo json_encode(["success" => false, "message" => "Missing request type"]);
   exit;
 }
 
-// kiosk has no logged-in citizen
-$citizenId = null;
-
-// generate reference number
+$citizenId = 1; // TEMP kiosk user
 $refNumber = strtoupper(bin2hex(random_bytes(4)));
-
-// defaults
 $status = "pending";
 $isViewed = 0;
 $formPath = null;
@@ -36,10 +34,8 @@ $formPath = null;
 $stmt = $conn->prepare("
   INSERT INTO requests
   (ref_number, citizen_id, type_id, status, is_viewed, form_path, requested_at, updated_at)
-  VALUES (?, NULL, ?, ?, ?, ?, NOW(), NOW())
+  VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
 ");
-
-$citizenId = 0;
 
 $stmt->bind_param(
   "siisis",
@@ -51,28 +47,10 @@ $stmt->bind_param(
   $formPath
 );
 
-if (!$stmt) {
-  echo json_encode([
-    "success" => false,
-    "message" => $conn->error
-  ]);
-  exit;
-}
-
-$stmt->execute();
-
-if (!$stmt->exec) {
+if (!$stmt->execute()) {
   echo json_encode([
     "success" => false,
     "message" => $stmt->error
-  ]);
-  exit;
-}
-
-if ($stmt->affected_rows <= 0) {
-  echo json_encode([
-    "success" => false,
-    "message" => "Insert failed"
   ]);
   exit;
 }

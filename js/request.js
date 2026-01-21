@@ -7,6 +7,36 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
+  // ✅ ADDED — DO NOT REMOVE ANYTHING ELSE
+  document.querySelectorAll('input[name="hasId"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.getElementById('nextBtn').disabled = false;
+    });
+  });
+
+  const nextBtn = document.getElementById("nextBtn");
+  const idCard = document.querySelector(".id-card");
+
+  nextBtn.addEventListener("click", () => {
+    const selected = document.querySelector('input[name="hasId"]:checked');
+    if (!selected) return;
+
+    if (selected.value === "yes") {
+      idCard.innerHTML = `
+      <div class="text-center">
+        <button class="btn btn-primary btn-lg" id="scanBtn">
+          📷 Scan ID
+        </button>
+      </div>
+    `;
+    }
+
+    if (selected.value === "no") {
+      idCard.style.display = "none";
+    }
+  });
+
+
   fetch("../api/request_types.php")
 
     .then(response => response.json())
@@ -25,8 +55,6 @@ document.addEventListener("DOMContentLoaded", function () {
     .catch(error => {
       console.error("❌ Failed to load request types", error);
     });
-
-
 
   select.addEventListener("change", () => {
     const requestTypeId = select.value;
@@ -50,7 +78,6 @@ document.addEventListener("DOMContentLoaded", function () {
       .then(fields => {
         console.log("📦 Fields for kiosk:", fields);
         renderDynamicKioskForm(fields);
-
       })
       .catch(err => {
         console.error("❌ Failed to load fields", err);
@@ -58,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-
+//para kay kimart
 // document.getElementById("confirmYes").addEventListener("click", () => {
 
 //   const formEl = window._pendingForm;
@@ -86,7 +113,6 @@ document.addEventListener("DOMContentLoaded", function () {
 //       showSummary(formEl, data.ref_number);
 //     });
 // });
-
 
 function submitRequestToSQL() {
   const formEl = window._pendingForm;
@@ -121,4 +147,12 @@ function submitRequestToSQL() {
       console.error("❌ Insert error:", err);
       alert("Failed to submit request");
     });
+}
+
+const confirmYes = document.getElementById("confirmYes");
+
+if (confirmYes) {
+  confirmYes.addEventListener("click", () => {
+    submitRequestToSQL();
+  });
 }
