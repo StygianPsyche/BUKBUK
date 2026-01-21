@@ -774,6 +774,43 @@ function initFormBehaviors() {
 /* =========================================================
    VALIDATION + CONFIRMATION
 ========================================================= */
+function populateConfirmDetails(formEl) {
+  const container = document.getElementById("confirmDetails");
+  if (!container) return;
+
+  let html = `<div class="list-group list-group-flush">`;
+
+  Array.from(formEl.elements).forEach(el => {
+    if (!el.name || el.type === "submit") return;
+
+    let value = "";
+
+    if (el.type === "radio") {
+      if (!el.checked) return;
+      value = el.value;
+    } else {
+      value = el.value;
+    }
+
+    if (!value) value = "(blank)";
+
+    const label =
+      el.closest(".mb-3")?.querySelector("label")?.innerText ||
+      el.name.replace(/_/g, " ");
+
+    html += `
+      <div class="list-group-item px-0">
+        <strong>${label}:</strong>
+        <span class="float-end">${value}</span>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+
 function validateAndConfirm(formEl) {
   const invalids = [];
   const errorNode = formEl.querySelector('#formError');
@@ -822,7 +859,10 @@ function validateAndConfirm(formEl) {
 
   // ---------- CONFIRM MODAL ----------
 
+
+  
   window._pendingForm = formEl;
+  populateConfirmDetails(formEl);
 
   const modalEl = document.getElementById('confirmModal');
   const confirmModal = bootstrap.Modal.getOrCreateInstance(modalEl);

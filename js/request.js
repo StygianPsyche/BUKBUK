@@ -85,34 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-//para kay kimart
-// document.getElementById("confirmYes").addEventListener("click", () => {
 
-//   const formEl = window._pendingForm;
-//   if (!formEl) return;
-
-//   const formData = new FormData(formEl);
-//   formData.append(
-//     "request_type_id",
-//     document.getElementById("requestTypeSelect").value
-//   );
-
-//   fetch("../api/submit_request.php", {
-//     method: "POST",
-//     body: formData
-//   })
-//     .then(res => res.json())
-//     .then(data => {
-//       console.log("SQL response:", data);
-
-//       if (!data.success) {
-//         alert(data.message || "Insert failed");
-//         return;
-//       }
-
-//       showSummary(formEl, data.ref_number);
-//     });
-// });
 
 function submitRequestToSQL() {
   const formEl = window._pendingForm;
