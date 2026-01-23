@@ -526,19 +526,12 @@ const TEMPLATE_REGISTRY = {
 /* =========================================================
    RENDER FORM BASED ON SELECT
 ========================================================= */
-console.log("Submitting request_type_id:",
-  document.getElementById("requestTypeSelect").value
-);
 function renderSelectedForm() {
   const requestTypeId = requestTypeSelect.value;
   if (!requestTypeId) return;
 
   fetch(`../api/get_request_fields.php?request_type_id=${requestTypeId}`)
-    .then(async res => {
-      const text = await res.text();
-      console.log("RAW RESPONSE:", text);
-      return JSON.parse(text);
-    })
+    .then(res => res.json())
     .then(fields => {
       if (!fields.length) {
         formContainer.innerHTML = '<p class="text-center">No fields configured.</p>';
@@ -713,12 +706,7 @@ function validateAndConfirm(formEl) {
     return;
   }
 
-
-
   // ---------- CONFIRM MODAL ----------
-
-  window._pendingForm = formEl;
-
   const modalEl = document.getElementById('confirmModal');
   const confirmModal = bootstrap.Modal.getOrCreateInstance(modalEl);
   console.log('✅ validation passed, showing confirm modal');
@@ -736,18 +724,16 @@ function validateAndConfirm(formEl) {
 
   modalEl.querySelector('#confirmYes').addEventListener('click', () => {
     confirmModal.hide();
-    submitRequestToSQL();
+    showSummary(formEl);
   });
-
-
 }
 
 
 /* =========================================================
    SUMMARY + PRINT
 ========================================================= */
-function showSummary(formEl, refNumber) {
-  // const ref = randRef();
+function showSummary(formEl) {
+  const ref = randRef();
   const summaryBody = document.getElementById('summaryBody');
   const entries = {};
 
@@ -769,7 +755,7 @@ function showSummary(formEl, refNumber) {
 
   let html = `
     <p><strong>Request Type:</strong> ${selectedText}</p>
-    <p><strong>Reference Number:</strong> ${refNumber}</p>
+    <p><strong>Reference Number:</strong> ${ref}</p>
     <hr>
   `;
 
