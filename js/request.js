@@ -1,4 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
+
+  const idModalEl = document.getElementById("idPromptModal");
+  const idModal = new bootstrap.Modal(idModalEl);
+
+  // Show modal immediately on page load
+  idModal.show();
+
+  document.getElementById("idYesBtn").addEventListener("click", () => {
+    sessionStorage.setItem("hasValidId", "yes");
+    idModal.hide();
+  });
+
+  document.getElementById("idNoBtn").addEventListener("click", () => {
+    sessionStorage.setItem("hasValidId", "no");
+    idModal.hide();
+  });
+
   const select = document.getElementById("requestTypeSelect");
   const formContainer = document.getElementById("formContainer");
 
