@@ -4,6 +4,8 @@
    ========================================= */
 
 .status-page {
+  position: relative;
+  z-index: 1;
   min-height: 100vh;
   background: linear-gradient(180deg, #2f8f5b, #3aa76d);
   display: flex;
@@ -25,7 +27,9 @@
   inset: 0;
   z-index: 0;
   overflow: hidden;
+  pointer-events: none;
 }
+
 
 .circle,
 .triangle,
