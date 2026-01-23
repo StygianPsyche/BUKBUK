@@ -8,7 +8,7 @@
   z-index: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  min-height: 100vh;
+  height: 100vh;
   background: linear-gradient(180deg, #2f8f5b, #3aa76d);
   display: flex;
   justify-content: center;
