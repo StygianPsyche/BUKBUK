@@ -293,4 +293,13 @@ h5 {
   border-color: #000 !important;
   background-color: #f8f9fa !important;
 }
-  
+
+/* Make Yes / No buttons visually equal */
+#idPromptModal .modal-footer .btn {
+  min-width: 110px;
+  padding: 10px 22px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
