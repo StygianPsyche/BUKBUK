@@ -7,6 +7,131 @@ let currentInput = null;
 let _bdayChangeHandler = null;
 let _ageInputHandler = null;
 
+window.scannedData = null
+
+function autofillFromScan(formEl) {
+  if (!window.scannedData || !formEl) return
+
+  const s = window.scannedData
+
+  const map = {
+    full_name: ["fullName", "complainantName", "ctfaName", "bpoName"],
+    address: ["address", "complainantAddress", "respondentAddress", "ownerAddress"],
+    contact_number: ["contactNum"],
+    birthdate: ["bday"],
+    age: ["age"],
+    civil_status: ["civilStatus"],
+    sex: ["sex"],
+    purpose: ["purpose"],
+    email_address: ["email"],
+    length_of_stay_brgy_ugong: ["lengthOfStay"],
+
+    construction: {
+      owner_name: ["ownerName"],
+      position: ["position"],
+      type: ["consType"],
+      others_specify: ["consOtherSpec"]
+    },
+
+    complaint: {
+      respondent_name: ["respondentName"],
+      respondent_address: ["respondentAddress"],
+      complaint_type: ["complaintType"],
+      complaint_body: ["complaintBody"]
+    }
+  }
+
+  function apply(val, names) {
+    if (!val) return
+    names.forEach(n => {
+      const el = formEl.querySelector(`[name="${n}"]`)
+      if (!el || el.value) return
+      el.value = val
+      el.dispatchEvent(new Event("input", { bubbles: true }))
+    })
+  }
+
+  Object.entries(map).forEach(([k, v]) => {
+    if (typeof v === "object" && !Array.isArray(v)) {
+      Object.entries(v).forEach(([sk, sn]) => {
+        apply(s[k]?.[sk], sn)
+      })
+    } else {
+      apply(s[k], v)
+    }
+  })
+}
+
+function renderDynamicKioskForm(fields) {
+  const form = document.createElement("form")
+  form.id = "activeForm"
+  form.noValidate = true
+
+  fields.forEach(f => {
+    const g = document.createElement("div")
+    g.className = "mb-3"
+
+    const l = document.createElement("label")
+    l.className = "form-label"
+    l.textContent = f.label
+
+    let i
+    if (f.field_type === "textarea") {
+      i = document.createElement("textarea")
+      i.rows = 3
+    } else {
+      i = document.createElement("input")
+      i.type = f.field_type
+    }
+
+    i.name = f.field_key
+    i.className = "form-control"
+    i.autocomplete = "off"
+    if (Number(f.is_required) === 1) i.required = true
+
+    g.append(l, i)
+    form.appendChild(g)
+  })
+
+  const b = document.createElement("button")
+  b.type = "submit"
+  b.className = "btn btn-primary w-100 mt-3"
+  b.textContent = "Submit Request"
+
+  form.appendChild(b)
+
+  const c = document.getElementById("formContainer")
+  c.innerHTML = ""
+  c.appendChild(form)
+
+  setTimeout(() => {
+    autofillFromScan(form)
+  }, 0)
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("requestTypeSelect")
+  const container = document.getElementById("formContainer")
+
+  if (!select || !container) return
+
+  select.addEventListener("change", () => {
+    const id = select.value
+    if (!id) {
+      container.innerHTML = ""
+      container.style.display = "none"
+      return
+    }
+
+    container.style.display = "block"
+
+    fetch(`../api/get_request_fields.php?request_type_id=${id}`)
+      .then(r => r.json())
+      .then(f => renderDynamicKioskForm(f))
+  })
+})
+
+
 // --- Helper utilities (kept from your original) ---
 function randRef() {
   const d = new Date();
