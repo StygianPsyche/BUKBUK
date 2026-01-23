@@ -1,6 +1,6 @@
 /* =========================================
-   🌿 STATUS PAGE — Kiosk-Ready Green Theme
-   Elderly-Accessible Version (1080x1920)
+   🌿 STATUS PAGE — Responsive Green Theme
+   Elderly-Accessible Version
    ========================================= */
 
 body {
@@ -8,61 +8,25 @@ body {
   font-family: "Poppins", sans-serif;
   background: linear-gradient(160deg, #2e8b57, #3cb371, #00b37a);
   color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  min-height: 100%;
+  display: block;
   text-align: center;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   font-size: 2.2rem;
   line-height: 1.8;
 }
 
-/* Form container */
-/* Default (desktop kiosk) */
+/* ==============================
+   Form Container
+   ============================== */
 #formContainer {
-  max-height: calc(100vh - 260px);
-}
-
-/* Tablets */
-@media (max-width: 1024px) {
-  #formContainer {
-    max-height: calc(100vh - 220px);
-  }
-}
-
-/* Phones */
-@media (max-width: 768px) {
-  #formContainer {
-    max-height: calc(100vh - 180px);
-    padding-bottom: 200px;
-    /* smaller keyboard */
-  }
-}
-
-/* Hide kiosk keyboard on phones */
-@media (max-width: 768px) {
-  .keyboard {
-    display: none !important;
-  }
-}
-
-
-#formContainer {
-  max-height: calc(100vh - 250px);
-  /* adjust based on header + buttons */
-  overflow-y: auto;
+  width: 100%;
+  max-width: 950px;
+  margin: 0 auto;
   padding: 1rem;
   box-sizing: border-box;
-}
-
-#formContainer {
-  padding-bottom: 280px;
-  /* height of on-screen keyboard */
-}
-
-#formContainer {
+  overflow: visible;
   scroll-behavior: smooth;
 }
 
@@ -73,7 +37,6 @@ textarea {
 }
 
 @media (max-width: 768px) {
-
   input,
   select,
   textarea {
@@ -90,8 +53,9 @@ textarea {
   margin: 1rem;
 }
 
-
-/* Floating shapes */
+/* ==============================
+   Floating Background Shapes
+   ============================== */
 .bg-patterns {
   position: fixed;
   inset: 0;
@@ -124,18 +88,19 @@ textarea {
   width: 80px;
   height: 80px;
   background: linear-gradient(45deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  clip-path: polygon(
+    50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%,
+    50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%
+  );
 }
 
 @keyframes float {
   0% {
     transform: translateY(0) rotate(0deg) scale(1);
   }
-
   50% {
     transform: translateY(-25px) rotate(180deg) scale(1.1);
   }
-
   100% {
     transform: translateY(0) rotate(360deg) scale(1);
   }
@@ -152,13 +117,15 @@ textarea {
   margin: 0 auto;
 }
 
-/* Card sections */
+/* ==============================
+   Card Sections
+   ============================== */
 .status-section,
 .input-section {
   background: rgba(255, 255, 255, 0.14);
   backdrop-filter: blur(16px);
   border-radius: 30px;
-  padding: 80px 60px;
+  padding: clamp(20px, 5vw, 80px);
   margin-bottom: 50px;
   box-shadow: 0 20px 55px rgba(0, 0, 0, 0.3);
 }
@@ -179,19 +146,17 @@ textarea {
 }
 
 /* ==============================
-   Input Field — FIXED FOR ELDERLY
+   Input Field
    ============================== */
 #refInput {
   background: rgba(255, 255, 255, 0.98);
   border: none;
   border-radius: 25px;
   width: 100%;
-  height: 140px;
-  /* explicit height for big numbers */
-  padding: 0 20px;
-  /* horizontal padding only */
-  font-size: 2rem;
-  /* huge typed numbers */
+  height: auto;
+  min-height: 70px;
+  padding: 0.6em 0.8em;
+  font-size: clamp(1.5rem, 4vw, 3rem);
   line-height: 1.1;
   color: #2e8b57;
   text-align: center;
@@ -201,10 +166,8 @@ textarea {
   -webkit-text-fill-color: #2e8b57;
 }
 
-/* Placeholder slightly smaller */
 #refInput::placeholder {
   font-size: 3.5rem;
-  /* readable but smaller than typed numbers */
   color: rgba(46, 139, 87, 0.7);
   font-weight: 700;
   text-align: center;
@@ -252,80 +215,8 @@ textarea {
 }
 
 /* ==============================
-   On-screen Keyboard
+   Mic Button
    ============================== */
-/* Hide kiosk keyboard on phones & tablets */
-@media (max-width: 768px) {
-  #keyboard {
-    display: none !important;
-  }
-}
-
-
-#keyboard {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.35);
-  padding: 35px;
-  z-index: 1000;
-}
-
-#keyboardLayout {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 35px;
-  justify-items: center;
-  padding: 15px;
-}
-
-.keyboard-button {
-  padding: 35px;
-  font-size: 3rem;
-  font-weight: bold;
-  border-radius: 20px;
-  border: none;
-  background: linear-gradient(135deg, #ffffff, #f3f3f3);
-  color: #2e8b57;
-  width: 95%;
-  max-width: 280px;
-  height: 130px;
-  display: flex;
-  /* use flexbox */
-  align-items: center;
-  /* vertical center */
-  justify-content: center;
-  /* horizontal center */
-  transition: all 0.2s ease;
-  text-align: center;
-  /* fallback text center */
-}
-
-
-.keyboard-button:hover {
-  transform: scale(1.05);
-  background: linear-gradient(135deg, #f9f9f9, #ffffff);
-}
-
-.keyboard-button:active {
-  transform: scale(0.96);
-  background: #e0e0e0;
-}
-
-[data-key="clear"] {
-  background: #ffd54f;
-  color: #333;
-}
-
-[data-key="enter"] {
-  background: #2e8b57;
-  color: #fff;
-}
-
-/* Mic Button */
 .mic-btn {
   font-size: 4rem;
   border: none;
@@ -348,41 +239,15 @@ textarea {
    Responsive Tweaks
    ============================== */
 @media (max-width: 1080px) {
-
   .status-section h4,
   .input-section h5 {
     font-size: 2.5rem;
-  }
-
-  #refInput {
-    font-size: 4rem;
-    height: 120px;
-    padding: 0 15px;
-    line-height: 1.1;
-  }
-
-  #refInput::placeholder {
-    font-size: 3rem;
   }
 
   .btn-custom,
   .btn-outline-primary {
     font-size: 2.4rem;
     padding: 22px 50px;
-  }
-
-  .keyboard-button {
-    font-size: 2.6rem;
-    height: 110px;
-  }
-}
-
-
-@media (max-width: 768px) {
-  body {
-    overflow-y: auto;
-    align-items: flex-start;
-    justify-content: flex-start;
   }
 }
 
@@ -397,20 +262,15 @@ textarea {
   }
 }
 
-/* =========================================
-   📱 MOBILE OVERRIDE — disable kiosk layout
-   ========================================= */
+/* ==============================
+   Mobile Override
+   ============================== */
 @media (max-width: 768px) {
-
-  /* Stop kiosk centering */
   body {
-    display: block;
     min-height: auto;
-    overflow-y: auto;
     text-align: center;
   }
 
-  /* Let cards flow naturally */
   .container {
     width: 100%;
     max-width: 100%;
@@ -426,30 +286,26 @@ textarea {
     border-radius: 20px;
   }
 
-  /* Reduce heading size */
   .status-section h4,
   .input-section h5 {
     font-size: 1.5rem;
     margin-bottom: 16px;
   }
 
-  /* Reduce paragraph text */
   .info-box p {
     font-size: 0.95rem;
     line-height: 1.4;
   }
 
-  /* Input field size fix */
   #refInput {
-    height: 70px;
     font-size: 1.5rem;
+    min-height: 70px;
   }
 
   #refInput::placeholder {
     font-size: 1.2rem;
   }
 
-  /* Buttons */
   .btn-custom,
   .btn-outline-primary {
     font-size: 1.2rem;
