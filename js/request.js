@@ -7,6 +7,36 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
+  // ✅ ADDED — DO NOT REMOVE ANYTHING ELSE
+  document.querySelectorAll('input[name="hasId"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.getElementById('nextBtn').disabled = false;
+    });
+  });
+
+  const nextBtn = document.getElementById("nextBtn");
+  const idCard = document.querySelector(".id-card");
+
+  nextBtn.addEventListener("click", () => {
+    const selected = document.querySelector('input[name="hasId"]:checked');
+    if (!selected) return;
+
+    if (selected.value === "yes") {
+      idCard.innerHTML = `
+      <div class="text-center">
+        <button class="btn btn-primary btn-lg" id="scanBtn">
+          📷 Scan ID
+        </button>
+      </div>
+    `;
+    }
+
+    if (selected.value === "no") {
+      idCard.style.display = "none";
+    }
+  });
+
+
   fetch("../api/request_types.php")
 
     .then(response => response.json())
@@ -25,8 +55,6 @@ document.addEventListener("DOMContentLoaded", function () {
     .catch(error => {
       console.error("❌ Failed to load request types", error);
     });
-
-
 
   select.addEventListener("change", () => {
     const requestTypeId = select.value;
@@ -56,3 +84,75 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 });
+
+//para kay kimart
+// document.getElementById("confirmYes").addEventListener("click", () => {
+
+//   const formEl = window._pendingForm;
+//   if (!formEl) return;
+
+//   const formData = new FormData(formEl);
+//   formData.append(
+//     "request_type_id",
+//     document.getElementById("requestTypeSelect").value
+//   );
+
+//   fetch("../api/submit_request.php", {
+//     method: "POST",
+//     body: formData
+//   })
+//     .then(res => res.json())
+//     .then(data => {
+//       console.log("SQL response:", data);
+
+//       if (!data.success) {
+//         alert(data.message || "Insert failed");
+//         return;
+//       }
+
+//       showSummary(formEl, data.ref_number);
+//     });
+// });
+
+function submitRequestToSQL() {
+  const formEl = window._pendingForm;
+  if (!formEl) {
+    console.error("❌ No pending form");
+    return;
+  }
+
+  const formData = new FormData(formEl);
+
+  formData.append(
+    "request_type_id",
+    document.getElementById("requestTypeSelect").value
+  );
+
+  fetch("../api/submit_request.php", {
+    method: "POST",
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      console.log("✅ SQL response:", data);
+
+      if (!data.success) {
+        alert(data.message || "Insert failed");
+        return;
+      }
+
+      showSummary(formEl, data.ref_number);
+    })
+    .catch(err => {
+      console.error("❌ Insert error:", err);
+      alert("Failed to submit request");
+    });
+}
+
+const confirmYes = document.getElementById("confirmYes");
+
+if (confirmYes) {
+  confirmYes.addEventListener("click", () => {
+    submitRequestToSQL();
+  });
+}

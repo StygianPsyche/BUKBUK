@@ -79,10 +79,41 @@
         </div>
       </div>
 
+     <!-- RADIO BUTTON SECTION -->
+<div class="col-md-12 mb-4">
+  <div class="card shadow-sm p-4 id-card">
+    <label class="form-label fw-bold">Do you have a valid ID?</label>
+
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="hasId" id="hasIdYes" value="yes">
+      <label class="form-check-label" for="hasIdYes">Yes</label>
+    </div>
+
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="hasId" id="hasIdNo" value="no">
+      <label class="form-check-label" for="hasIdNo">No</label>
+    </div>
+
+    <!-- NEXT BUTTON -->
+    <div class="mt-3 text-end">
+      <button type="button" class="btn btn-primary" id="nextBtn" disabled>
+        Next →
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
       <!-- FORM BELOW -->
       <div class="col-md-12">
         <div class="card shadow-sm p-4" id="formContainer">
           <!-- content injected here -->
+
+          <form id="dynamicForm">
+            <!-- dynamic inputs -->
+
+          </form>
         </div>
       </div>
 

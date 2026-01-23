@@ -2,6 +2,11 @@
    STATUS PAGE ONLY
    Fully Scoped to avoid conflicts
    ========================================= */
+html,
+body {
+  height: 100%;
+  overflow-x: hidden;
+}
 
 .status-page {
   position: relative;
