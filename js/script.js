@@ -62,53 +62,6 @@ function autofillFromScan(formEl) {
   })
 }
 
-function renderDynamicKioskForm(fields) {
-  const form = document.createElement("form")
-  form.id = "activeForm"
-  form.noValidate = true
-
-  fields.forEach(f => {
-    const g = document.createElement("div")
-    g.className = "mb-3"
-
-    const l = document.createElement("label")
-    l.className = "form-label"
-    l.textContent = f.label
-
-    let i
-    if (f.field_type === "textarea") {
-      i = document.createElement("textarea")
-      i.rows = 3
-    } else {
-      i = document.createElement("input")
-      i.type = f.field_type
-    }
-
-    i.name = f.field_key
-    i.className = "form-control"
-    i.autocomplete = "off"
-    if (Number(f.is_required) === 1) i.required = true
-
-    g.append(l, i)
-    form.appendChild(g)
-  })
-
-  const b = document.createElement("button")
-  b.type = "submit"
-  b.className = "btn btn-primary w-100 mt-3"
-  b.textContent = "Submit Request"
-
-  form.appendChild(b)
-
-  const c = document.getElementById("formContainer")
-  c.innerHTML = ""
-  c.appendChild(form)
-
-  setTimeout(() => {
-    autofillFromScan(form)
-  }, 0)
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const select = document.getElementById("requestTypeSelect")
   const container = document.getElementById("formContainer")
@@ -911,57 +864,6 @@ function showSummary(formEl) {
   });
 }
 
-function renderDynamicKioskForm(fields) {
-  const form = document.createElement('form');
-  form.id = 'activeForm';
-  form.noValidate = true;
-
-  fields.forEach(f => {
-    const group = document.createElement('div');
-    group.className = 'mb-3';
-
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.textContent = f.label;
-
-    let input;
-
-    if (f.field_type === 'textarea') {
-      input = document.createElement('textarea');
-      input.rows = 3;
-    } else {
-      input = document.createElement('input');
-      input.type = f.field_type;
-    }
-
-    input.name = f.field_key;
-    input.className = 'form-control';
-    input.autocomplete = 'off';
-
-    if (f.is_required == 1) {
-      input.required = true;
-    }
-
-    group.append(label, input);
-    form.appendChild(group);
-  });
-
-  const btn = document.createElement('button');
-  btn.type = 'submit';
-  btn.className = 'btn btn-primary w-100 mt-3';
-  btn.textContent = 'Submit Request';
-
-  form.appendChild(btn);
-
-  formContainer.innerHTML = '';
-  formContainer.appendChild(form);
-
-  // 🔥 reuse what already works
-  initFormBehaviors();
-  initializeDatePickers();
-}
-
-
 // ---------- startup ----------
 // requestTypeSelect.addEventListener('change', renderSelectedForm);
 document.addEventListener('DOMContentLoaded', () => {
@@ -991,56 +893,54 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
 function renderDynamicKioskForm(fields) {
-  const form = document.createElement("form");
-  form.id = "activeForm";
-  form.noValidate = true;
+  const form = document.createElement("form")
+  form.id = "activeForm"
+  form.noValidate = true
 
   fields.forEach(f => {
-    const group = document.createElement("div");
-    group.className = "mb-3";
+    const group = document.createElement("div")
+    group.className = "mb-3"
 
-    const label = document.createElement("label");
-    label.className = "form-label";
-    label.textContent = f.label;
+    const label = document.createElement("label")
+    label.className = "form-label"
+    label.textContent = f.label
 
-    let input;
-
-    // basic input types for kiosk
+    let input
     if (f.field_type === "textarea") {
-      input = document.createElement("textarea");
-      input.rows = 3;
+      input = document.createElement("textarea")
+      input.rows = 3
     } else {
-      input = document.createElement("input");
-      input.type = f.field_type; // text, number, date
+      input = document.createElement("input")
+      input.type = f.field_type
     }
 
-    input.name = f.field_key;
-    input.className = "form-control";
-    input.autocomplete = "off";
+    input.name = f.field_key
+    input.className = "form-control"
+    input.autocomplete = "off"
 
     if (Number(f.is_required) === 1) {
-      input.required = true;
+      input.required = true
     }
 
-    group.appendChild(label);
-    group.appendChild(input);
-    form.appendChild(group);
-  });
+    group.append(label, input)
+    form.appendChild(group)
+  })
 
-  const submitBtn = document.createElement("button");
-  submitBtn.type = "submit";
-  submitBtn.className = "btn btn-primary w-100 mt-3";
-  submitBtn.textContent = "Submit Request";
+  const submitBtn = document.createElement("button")
+  submitBtn.type = "submit"
+  submitBtn.className = "btn btn-primary w-100 mt-3"
+  submitBtn.textContent = "Submit Request"
 
-  form.appendChild(submitBtn);
+  form.appendChild(submitBtn)
 
-  // render into kiosk
-  formContainer.innerHTML = "";
-  formContainer.appendChild(form);
+  formContainer.innerHTML = ""
+  formContainer.appendChild(form)
 
-  // 🔥 reuse your existing, working logic
-  initFormBehaviors();
-  initializeDatePickers();
+  setTimeout(() => {
+    autofillFromScan(form)
+  }, 0)
+
+  initFormBehaviors()
+  initializeDatePickers()
 }
