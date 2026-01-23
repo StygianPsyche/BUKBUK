@@ -3,8 +3,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const idPromptModalEl = document.getElementById("idPromptModal")
   const cameraModalEl = document.getElementById("cameraModal")
   const video = document.getElementById("idCamera")
+  const scanBtn = document.getElementById("scanBtn")
 
-  if (!idYesBtn || !cameraModalEl || !video) return
+  if (!idYesBtn || !cameraModalEl || !video || !scanBtn) return
 
   let stream = null
 
@@ -38,12 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
-  cameraModalEl.addEventListener("hidden.bs.modal", () => {
-    closeCamera()
-  })
-
-  window.captureScan = async function () {
+  scanBtn.addEventListener("click", async () => {
     if (!stream) return
+
+    scanBtn.disabled = true
 
     const canvas = document.createElement("canvas")
     canvas.width = video.videoWidth
@@ -52,14 +51,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const base64 = canvas.toDataURL("image/jpeg")
 
-    const res = await fetch("/scan", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: base64 })
-    })
+    try {
+      const res = await fetch("/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64 })
+      })
 
-    const data = await res.json()
-    window.scannedData = data.result || {}
-    cameraModal.hide()
-  }
+      const data = await res.json()
+      window.scannedData = data.result || {}
+      cameraModal.hide()
+    } catch {
+      alert("Scan failed. Please try again.")
+    } finally {
+      scanBtn.disabled = false
+    }
+  })
+
+  cameraModalEl.addEventListener("hidden.bs.modal", () => {
+    closeCamera()
+  })
 })
