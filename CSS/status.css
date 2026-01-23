@@ -9,13 +9,14 @@ body {
   background: linear-gradient(160deg, #2e8b57, #3cb371, #00b37a);
   color: #fff;
   min-height: 100%;
-  display: block;
   text-align: center;
   overflow-x: hidden;
   overflow-y: auto;
-  font-size: 2.2rem;
-  line-height: 1.8;
+
+  font-size: 16px;
+  line-height: 1.6;
 }
+
 
 /* ==============================
    Form Container
@@ -126,7 +127,7 @@ textarea {
   backdrop-filter: blur(16px);
   border-radius: 30px;
   padding: clamp(20px, 5vw, 80px);
-  margin-bottom: 50px;
+  margin-bottom: clamp(16px, 4vw, 48px);
   box-shadow: 0 20px 55px rgba(0, 0, 0, 0.3);
 }
 
@@ -134,15 +135,15 @@ textarea {
 .input-section h5 {
   font-weight: 800;
   color: #ffffff;
-  font-size: 3.2rem;
-  margin-bottom: 35px;
+  font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+  margin-bottom: 1.2rem;
   text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 .info-box p {
-  font-size: 2.5rem;
+  font-size: clamp(1rem, 2.6vw, 1.6rem);
   color: #e8f5e9;
-  margin-bottom: 20px;
+  margin-bottom: 1rem;
 }
 
 /* ==============================
@@ -167,9 +168,9 @@ textarea {
 }
 
 #refInput::placeholder {
-  font-size: 3.5rem;
+  font-size: clamp(1rem, 3vw, 1.6rem);
   color: rgba(46, 139, 87, 0.7);
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
 }
 
@@ -251,17 +252,6 @@ textarea {
   }
 }
 
-@media (max-width: 768px) {
-  body {
-    font-size: 1.4rem;
-    line-height: 1.5;
-  }
-
-  .info-box p {
-    font-size: 1.3rem;
-  }
-}
-
 /* ==============================
    Mobile Override
    ============================== */
@@ -298,7 +288,7 @@ textarea {
   }
 
   #refInput {
-    font-size: 1.5rem;
+    font-size: clamp(1.4rem, 4vw, 2.4rem);
     min-height: 70px;
   }
 
@@ -308,8 +298,8 @@ textarea {
 
   .btn-custom,
   .btn-outline-primary {
-    font-size: 1.2rem;
-    padding: 14px 24px;
+    font-size: clamp(1rem, 2.8vw, 1.8rem);
+    padding: clamp(12px, 3vw, 28px) clamp(20px, 5vw, 60px);
   }
 }
 
