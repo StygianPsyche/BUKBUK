@@ -1,4 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Ask once when the page loads
+  const hasValidId = confirm("Do you have a valid ID?");
+
+  // Store for later use if needed
+  sessionStorage.setItem("hasValidId", hasValidId ? "yes" : "no");
+
   const select = document.getElementById("requestTypeSelect");
   const formContainer = document.getElementById("formContainer");
 
