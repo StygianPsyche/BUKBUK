@@ -284,3 +284,19 @@ h5 {
 .modal-footer .btn-primary {
   background-color: #0d6efd !important;
 }
+
+#idNoBtn {
+  color: #333;
+  border-color: #333;
+  background-color: #f8f9fa;
+}
+
+#idNoBtn:hover {
+  background-color: #e9ecef;
+  color: #000;
+}
+
+#idNoBtn,
+#idYesBtn {
+  min-width: 90px;
+}
