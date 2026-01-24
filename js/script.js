@@ -980,49 +980,49 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function renderDynamicKioskForm(fields) {
-  const form = document.createElement("form")
-  form.id = "activeForm"
-  form.noValidate = true
+  const form = document.createElement("form");
+  form.id = "activeForm";
+  form.noValidate = true;
 
   fields.forEach(f => {
-    const group = document.createElement("div")
-    group.className = "mb-3"
+    const group = document.createElement("div");
+    group.className = "mb-3";
 
-    const label = document.createElement("label")
-    label.className = "form-label"
-    label.textContent = f.label
+    const label = document.createElement("label");
+    label.className = "form-label";
+    label.textContent = f.label;
 
-    let input
+    let input;
     if (f.field_type === "textarea") {
-      input = document.createElement("textarea")
-      input.rows = 3
+      input = document.createElement("textarea");
+      input.rows = 3;
     } else {
-      input = document.createElement("input")
-      input.type = f.field_type
+      input = document.createElement("input");
+      input.type = f.field_type;
     }
 
-    input.name = f.field_key
-    input.className = "form-control"
-    input.autocomplete = "off"
+    input.name = f.field_key;
+    input.className = "form-control";
+    input.autocomplete = "off";
 
     if (Number(f.is_required) === 1) {
-      input.required = true
+      input.required = true;
     }
 
-    group.append(label, input)
-    form.appendChild(group)
-  })
+    group.append(label, input);
+    form.appendChild(group);
+  });
 
-  const submitBtn = document.createElement("button")
-  submitBtn.type = "submit"
-  submitBtn.className = "btn btn-primary w-100 mt-3"
-  submitBtn.textContent = "Submit Request"
-
-  form.appendChild(submitBtn)
+  const submitBtn = document.createElement("button");
+  submitBtn.type = "submit";
+  submitBtn.className = "btn btn-primary w-100 mt-3";
+  submitBtn.textContent = "Submit Request";
+  form.appendChild(submitBtn);
 
   formContainer.innerHTML = "";
   formContainer.appendChild(form);
 
+  // ✅ AUTOFILL HERE
   setTimeout(() => {
     autofillFromScan(form);
   }, 0);
