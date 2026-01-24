@@ -1020,14 +1020,13 @@ function renderDynamicKioskForm(fields) {
 
   form.appendChild(submitBtn)
 
-  formContainer.innerHTML = ""
-  formContainer.appendChild(form)
+  formContainer.innerHTML = "";
+  formContainer.appendChild(form);
 
   setTimeout(() => {
     autofillFromScan(form);
   }, 0);
 
-
-  initFormBehaviors()
-  initializeDatePickers()
+  initFormBehaviors();
+  initializeDatePickers();
 }
