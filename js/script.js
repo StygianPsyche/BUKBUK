@@ -45,18 +45,41 @@ function autofillFromScan(formEl) {
     el.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
-  function normalizeDate(d) {
+  function parseScannedDate(d) {
     if (!d) return "";
-    const date = new Date(d);
-    if (isNaN(date)) return "";
+
+    // handle "08 MAR 2004"
+    const parts = d.trim().split(/\s+/);
+    if (parts.length === 3) {
+      const [day, mon, year] = parts;
+      const months = {
+        JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5,
+        JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11
+      };
+
+      const m = months[mon.toUpperCase()];
+      if (m !== undefined) {
+        return new Date(Number(year), m, Number(day));
+      }
+    }
+
+    // fallback
+    return new Date(d);
+  }
+
+  function normalizeDate(d) {
+    const date = parseScannedDate(d);
+    if (!(date instanceof Date) || isNaN(date)) return "";
+
     const m = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     const y = date.getFullYear();
     return `${m}/${day}/${y}`;
   }
 
+
   // Flat fields
-  setInput("fullName", s.full_name);
+  setInput("full_name", s.full_name);
   setInput("complainantName", s.full_name);
   setInput("ctfaName", s.full_name);
   setInput("bpoName", s.full_name);
