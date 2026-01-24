@@ -10,56 +10,114 @@ let _ageInputHandler = null;
 window.scannedData = null
 
 function autofillFromScan(formEl) {
-  if (!window.scannedData || !formEl) return
+  if (!window.scannedData || !formEl) return;
 
-  const s = window.scannedData
+  const s = window.scannedData;
 
-  const map = {
-    full_name: ["fullName", "complainantName", "ctfaName", "bpoName"],
-    address: ["address", "complainantAddress", "respondentAddress", "ownerAddress"],
-    contact_number: ["contactNum"],
-    birthdate: ["bday"],
-    age: ["age"],
-    civil_status: ["civilStatus"],
-    sex: ["sex"],
-    purpose: ["purpose"],
-    email_address: ["email"],
-    length_of_stay_brgy_ugong: ["lengthOfStay"],
+  function setInput(name, value) {
+    if (!value) return;
 
-    construction: {
-      owner_name: ["ownerName"],
-      position: ["position"],
-      type: ["consType"],
-      others_specify: ["consOtherSpec"]
-    },
+    const el = formEl.querySelector(`[name="${name}"]`);
+    if (!el) return;
 
-    complaint: {
-      respondent_name: ["respondentName"],
-      respondent_address: ["respondentAddress"],
-      complaint_type: ["complaintType"],
-      complaint_body: ["complaintBody"]
+    // Skip if user already typed something
+    if (el.type !== "radio" && el.type !== "checkbox" && el.value) return;
+
+    if (el.type === "radio") {
+      const radio = formEl.querySelector(
+        `input[name="${name}"][value="${value}"]`
+      );
+      if (radio) {
+        radio.checked = true;
+        radio.dispatchEvent(new Event("change", { bubbles: true }));
+      }
+      return;
+    }
+
+    if (el.tagName === "SELECT") {
+      el.value = value;
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+      return;
+    }
+
+    el.value = value;
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function normalizeDate(d) {
+    if (!d) return "";
+    const date = new Date(d);
+    if (isNaN(date)) return "";
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const y = date.getFullYear();
+    return `${m}/${day}/${y}`;
+  }
+
+  // Flat fields
+  setInput("fullName", s.full_name);
+  setInput("complainantName", s.full_name);
+  setInput("ctfaName", s.full_name);
+  setInput("bpoName", s.full_name);
+
+  setInput("address", s.address);
+  setInput("complainantAddress", s.address);
+  setInput("respondentAddress", s.address);
+  setInput("ownerAddress", s.address);
+
+  setInput("contactNum", s.contact_number);
+  setInput("email", s.email_address);
+  setInput("civilStatus", s.civil_status);
+  setInput("purpose", s.purpose);
+  setInput("lengthOfStay", s.length_of_stay_brgy_ugong);
+
+  setInput("sex", s.sex);
+
+  if (s.birthdate) {
+    setInput("bday", normalizeDate(s.birthdate));
+  }
+
+  if (s.age) {
+    setInput("age", s.age);
+  }
+
+  // Construction section
+  if (s.construction) {
+    setInput("ownerName", s.construction.owner_name);
+    setInput("position", s.construction.position);
+
+    if (s.construction.type) {
+      const types = Array.isArray(s.construction.type)
+        ? s.construction.type
+        : [s.construction.type];
+
+      types.forEach(t => {
+        const cb = formEl.querySelector(
+          `input[name="consType"][value="${t}"]`
+        );
+        if (cb) {
+          cb.checked = true;
+          cb.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+    }
+
+    if (s.construction.others_specify) {
+      setInput("consOtherSpec", s.construction.others_specify);
     }
   }
 
-  function apply(val, names) {
-    if (!val) return
-    names.forEach(n => {
-      const el = formEl.querySelector(`[name="${n}"]`)
-      if (!el || el.value) return
-      el.value = val
-      el.dispatchEvent(new Event("input", { bubbles: true }))
-    })
+  // Complaint section
+  if (s.complaint) {
+    setInput("respondentName", s.complaint.respondent_name);
+    setInput("respondentAddress", s.complaint.respondent_address);
+    setInput("complaintType", s.complaint.complaint_type);
+    setInput("complaintBody", s.complaint.complaint_body);
   }
 
-  Object.entries(map).forEach(([k, v]) => {
-    if (typeof v === "object" && !Array.isArray(v)) {
-      Object.entries(v).forEach(([sk, sn]) => {
-        apply(s[k]?.[sk], sn)
-      })
-    } else {
-      apply(s[k], v)
-    }
-  })
+  // Rewire auto-age once bday is filled
+  wireAutoAge();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -858,10 +916,15 @@ function showSummary(formEl) {
     setTimeout(() => {
       document.getElementById('printingOverlay').style.display = 'none';
       summaryModal.hide();
+
+      // ✅ correct place
+      window.scannedData = null;
+
       window.location.href = '../index.html';
       formEl.reset();
     }, 3000);
   });
+
 }
 
 // ---------- startup ----------
@@ -938,8 +1001,9 @@ function renderDynamicKioskForm(fields) {
   formContainer.appendChild(form)
 
   setTimeout(() => {
-    autofillFromScan(form)
-  }, 0)
+    autofillFromScan(form);
+  }, 0);
+
 
   initFormBehaviors()
   initializeDatePickers()
