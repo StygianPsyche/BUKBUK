@@ -7,142 +7,6 @@ let currentInput = null;
 let _bdayChangeHandler = null;
 let _ageInputHandler = null;
 
-window.scannedData = null
-
-function autofillFromScan(formEl) {
-  if (!window.scannedData || !formEl) return;
-
-  const s = window.scannedData;
-
-  function setInput(name, value) {
-    if (!value) return;
-
-    const el = formEl.querySelector(`[name="${name}"]`);
-    if (!el) return;
-
-    // Skip if user already typed something
-    if (el.type !== "radio" && el.type !== "checkbox" && el.value) return;
-
-    if (el.type === "radio") {
-      const radio = formEl.querySelector(
-        `input[name="${name}"][value="${value}"]`
-      );
-      if (radio) {
-        radio.checked = true;
-        radio.dispatchEvent(new Event("change", { bubbles: true }));
-      }
-      return;
-    }
-
-    if (el.tagName === "SELECT") {
-      el.value = value;
-      el.dispatchEvent(new Event("change", { bubbles: true }));
-      return;
-    }
-
-    el.value = value;
-    el.dispatchEvent(new Event("input", { bubbles: true }));
-    el.dispatchEvent(new Event("change", { bubbles: true }));
-  }
-
-  function parseScannedDate(d) {
-    if (!d) return "";
-
-    // handle "08 MAR 2004"
-    const parts = d.trim().split(/\s+/);
-    if (parts.length === 3) {
-      const [day, mon, year] = parts;
-      const months = {
-        JAN: 0, FEB: 1, MAR: 2, APR: 3, MAY: 4, JUN: 5,
-        JUL: 6, AUG: 7, SEP: 8, OCT: 9, NOV: 10, DEC: 11
-      };
-
-      const m = months[mon.toUpperCase()];
-      if (m !== undefined) {
-        return new Date(Number(year), m, Number(day));
-      }
-    }
-
-    // fallback
-    return new Date(d);
-  }
-
-  function normalizeDate(d) {
-    const date = parseScannedDate(d);
-    if (!(date instanceof Date) || isNaN(date)) return "";
-
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const y = date.getFullYear();
-    return `${m}/${day}/${y}`;
-  }
-
-
-  // Flat fields
-  setInput("full_name", s.full_name);
-  setInput("complainantName", s.full_name);
-  setInput("ctfaName", s.full_name);
-  setInput("bpoName", s.full_name);
-
-  setInput("address", s.address);
-  setInput("complainantAddress", s.address);
-  setInput("respondentAddress", s.address);
-  setInput("ownerAddress", s.address);
-
-  setInput("contactNum", s.contact_number);
-  setInput("email", s.email_address);
-  setInput("civilStatus", s.civil_status);
-  setInput("purpose", s.purpose);
-  setInput("lengthOfStay", s.length_of_stay_brgy_ugong);
-
-  setInput("sex", s.sex);
-
-  if (s.birthdate) {
-    setInput("bday", normalizeDate(s.birthdate));
-  }
-
-  if (s.age) {
-    setInput("age", s.age);
-  }
-
-  // Construction section
-  if (s.construction) {
-    setInput("ownerName", s.construction.owner_name);
-    setInput("position", s.construction.position);
-
-    if (s.construction.type) {
-      const types = Array.isArray(s.construction.type)
-        ? s.construction.type
-        : [s.construction.type];
-
-      types.forEach(t => {
-        const cb = formEl.querySelector(
-          `input[name="consType"][value="${t}"]`
-        );
-        if (cb) {
-          cb.checked = true;
-          cb.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-      });
-    }
-
-    if (s.construction.others_specify) {
-      setInput("consOtherSpec", s.construction.others_specify);
-    }
-  }
-
-  // Complaint section
-  if (s.complaint) {
-    setInput("respondentName", s.complaint.respondent_name);
-    setInput("respondentAddress", s.complaint.respondent_address);
-    setInput("complaintType", s.complaint.complaint_type);
-    setInput("complaintBody", s.complaint.complaint_body);
-  }
-
-  // Rewire auto-age once bday is filled
-  wireAutoAge();
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const select = document.getElementById("requestTypeSelect")
   const container = document.getElementById("formContainer")
@@ -1021,12 +885,12 @@ function renderDynamicKioskForm(fields) {
 
   formContainer.innerHTML = "";
   formContainer.appendChild(form);
-
-  // ✅ AUTOFILL HERE
-  setTimeout(() => {
-    autofillFromScan(form);
-  }, 0);
-
+  
   initFormBehaviors();
   initializeDatePickers();
+
+  // 🔥 auto-fill from scanned ID if available
+  if (window.applyAutofillIfAvailable) {
+    window.applyAutofillIfAvailable();
+  }
 }
