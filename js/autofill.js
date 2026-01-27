@@ -57,9 +57,32 @@
 
   // Public hook
   window.applyAutofillIfAvailable = function () {
-    const formEl = document.getElementById('activeForm');
-    if (!formEl || !window.scannedData) return;
+      const form = document.getElementById("activeForm");
+      const data = window.scannedData;
 
-    autofillForm(formEl, window.scannedData);
-  };
+      console.log("🟢 autofill running");
+      console.log("form:", form);
+      console.log("data:", data);
+
+      if (!form || !data) return;
+
+      Object.keys(data).forEach(key => {
+        const input = form.querySelector(`#${key}`);
+        console.log("trying key:", key, "found:", input);
+
+        if (!input) return;
+
+        let value = data[key];
+
+        // normalize sex
+        if (key === "sex") {
+          if (value === "M") value = "Male";
+          if (value === "F") value = "Female";
+        }
+
+        input.value = value;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+    };
 })();
