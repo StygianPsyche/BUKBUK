@@ -866,6 +866,7 @@ function renderDynamicKioskForm(fields) {
     }
 
     input.name = f.field_key;
+    input.id = f.field_key; // ⭐ REQUIRED FOR AUTOFILL
     input.className = "form-control";
     input.autocomplete = "off";
 
