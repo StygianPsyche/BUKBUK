@@ -11,7 +11,7 @@ if (micBtn) {
   micBtn.addEventListener("click", async () => {
     if (listening) {
       recorder.stop()
-      micBtn.textContent = "🎤 Start Listening"
+      micBtn.textContent = "🎤"
       listening = false
       return
     }
@@ -114,7 +114,7 @@ if (micBtn) {
       }
 
       recorder.start()
-      micBtn.textContent = "🛑 Stop Listening"
+      micBtn.textContent = "🛑"
       listening = true
 
     } catch (err) {
