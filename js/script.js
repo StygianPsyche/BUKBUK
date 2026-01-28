@@ -7,6 +7,29 @@ let currentInput = null;
 let _bdayChangeHandler = null;
 let _ageInputHandler = null;
 
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("requestTypeSelect")
+  const container = document.getElementById("formContainer")
+
+  if (!select || !container) return
+
+  select.addEventListener("change", () => {
+    const id = select.value
+    if (!id) {
+      container.innerHTML = ""
+      container.style.display = "none"
+      return
+    }
+
+    container.style.display = "block"
+
+    fetch(`../api/get_request_fields.php?request_type_id=${id}`)
+      .then(r => r.json())
+      .then(f => renderDynamicKioskForm(f))
+  })
+})
+
+
 // --- Helper utilities (kept from your original) ---
 function randRef() {
   const d = new Date();
@@ -780,62 +803,16 @@ function showSummary(formEl) {
     setTimeout(() => {
       document.getElementById('printingOverlay').style.display = 'none';
       summaryModal.hide();
+
+      // ✅ correct place
+      window.scannedData = null;
+
       window.location.href = '../index.html';
       formEl.reset();
     }, 3000);
   });
+
 }
-
-function renderDynamicKioskForm(fields) {
-  const form = document.createElement('form');
-  form.id = 'activeForm';
-  form.noValidate = true;
-
-  fields.forEach(f => {
-    const group = document.createElement('div');
-    group.className = 'mb-3';
-
-    const label = document.createElement('label');
-    label.className = 'form-label';
-    label.textContent = f.label;
-
-    let input;
-
-    if (f.field_type === 'textarea') {
-      input = document.createElement('textarea');
-      input.rows = 3;
-    } else {
-      input = document.createElement('input');
-      input.type = f.field_type;
-    }
-
-    input.name = f.field_key;
-    input.className = 'form-control';
-    input.autocomplete = 'off';
-
-    if (f.is_required == 1) {
-      input.required = true;
-    }
-
-    group.append(label, input);
-    form.appendChild(group);
-  });
-
-  const btn = document.createElement('button');
-  btn.type = 'submit';
-  btn.className = 'btn btn-primary w-100 mt-3';
-  btn.textContent = 'Submit Request';
-
-  form.appendChild(btn);
-
-  formContainer.innerHTML = '';
-  formContainer.appendChild(form);
-
-  // 🔥 reuse what already works
-  initFormBehaviors();
-  initializeDatePickers();
-}
-
 
 // ---------- startup ----------
 // requestTypeSelect.addEventListener('change', renderSelectedForm);
@@ -866,7 +843,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
 function renderDynamicKioskForm(fields) {
   const form = document.createElement("form");
   form.id = "activeForm";
@@ -881,17 +857,16 @@ function renderDynamicKioskForm(fields) {
     label.textContent = f.label;
 
     let input;
-
-    // basic input types for kiosk
     if (f.field_type === "textarea") {
       input = document.createElement("textarea");
       input.rows = 3;
     } else {
       input = document.createElement("input");
-      input.type = f.field_type; // text, number, date
+      input.type = f.field_type;
     }
 
     input.name = f.field_key;
+    input.id = f.field_key; // ⭐ REQUIRED FOR AUTOFILL
     input.className = "form-control";
     input.autocomplete = "off";
 
@@ -899,8 +874,7 @@ function renderDynamicKioskForm(fields) {
       input.required = true;
     }
 
-    group.appendChild(label);
-    group.appendChild(input);
+    group.append(label, input);
     form.appendChild(group);
   });
 
@@ -908,14 +882,16 @@ function renderDynamicKioskForm(fields) {
   submitBtn.type = "submit";
   submitBtn.className = "btn btn-primary w-100 mt-3";
   submitBtn.textContent = "Submit Request";
-
   form.appendChild(submitBtn);
 
-  // render into kiosk
   formContainer.innerHTML = "";
   formContainer.appendChild(form);
-
-  // 🔥 reuse your existing, working logic
+  
   initFormBehaviors();
   initializeDatePickers();
+
+  // 🔥 auto-fill from scanned ID if available
+  if (window.applyAutofillIfAvailable) {
+    window.applyAutofillIfAvailable();
+  }
 }
