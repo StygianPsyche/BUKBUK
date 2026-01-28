@@ -1,5 +1,5 @@
 // stt.js
-// Speech-to-text correction for scanned + autofilled forms
+// Speech-to-text correction with safe, non-destructive merging
 
 const micBtn = document.getElementById("micToggleBtn")
 
@@ -9,7 +9,6 @@ let chunks = []
 
 if (micBtn) {
   micBtn.addEventListener("click", async () => {
-    // STOP LISTENING
     if (listening) {
       recorder.stop()
       micBtn.textContent = "🎤 Start Listening"
@@ -32,9 +31,7 @@ if (micBtn) {
           try {
             const audio = reader.result.split(",")[1]
 
-            console.log("🟢 STT audio captured")
-
-            // 1. Speech to text
+            // 1. STT
             const sttRes = await fetch(
               "https://backend-production-79ea.up.railway.app/stt",
               {
@@ -45,18 +42,15 @@ if (micBtn) {
             )
 
             const { text } = await sttRes.json()
-            console.log("🟢 Transcript:", text)
-
             if (!text) return
 
-            // 2. Collect current form state
+            // 2. Collect current state (truth source)
             const form = document.getElementById("activeForm")
             const current = {}
 
             if (form) {
               form.querySelectorAll("input, textarea, select").forEach(el => {
                 if (!el.id) return
-
                 if (el.type === "radio") {
                   if (el.checked) current[el.id] = el.value
                 } else {
@@ -65,9 +59,7 @@ if (micBtn) {
               })
             }
 
-            console.log("🟢 Current form values:", current)
-
-            // 3. Send transcript + current data for correction
+            // 3. Correction request
             const fixRes = await fetch(
               "https://backend-production-79ea.up.railway.app/correct",
               {
@@ -81,18 +73,15 @@ if (micBtn) {
             )
 
             const { result } = await fixRes.json()
-            console.log("🟢 Corrections:", result)
+            if (!result || Object.keys(result).length === 0) return
 
-            if (!form || !result || Object.keys(result).length === 0) return
-
-            // 4. Apply corrections to form
+            // 4. Apply corrections ONLY for mentioned keys
             Object.entries(result).forEach(([key, value]) => {
-              if (value == null) return
+              if (value === undefined || value === null) return
 
               const input = form.querySelector(`#${key}`)
               if (!input) return
 
-              // Normalize sex values
               if (key === "sex") {
                 if (value === "M") value = "Male"
                 if (value === "F") value = "Female"
@@ -111,7 +100,7 @@ if (micBtn) {
               input.dispatchEvent(new Event("change", { bubbles: true }))
             })
 
-            // 5. Sync corrected values back to scannedData
+            // 5. SAFE MERGE back into scannedData
             if (window.scannedData) {
               Object.assign(window.scannedData, result)
             }
@@ -129,7 +118,7 @@ if (micBtn) {
       listening = true
 
     } catch (err) {
-      console.error("❌ Microphone access error:", err)
+      console.error("❌ Microphone error:", err)
     }
   })
 }
