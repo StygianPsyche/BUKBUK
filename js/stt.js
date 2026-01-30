@@ -1,6 +1,6 @@
 // stt.js
 // Speech-to-text correction with safe, non-destructive merging
-
+//stt fixed merge
 const micBtn = document.getElementById("micToggleBtn")
 
 let listening = false
