@@ -2,12 +2,33 @@
 let requestTypeSelect;
 let formContainer;
 
-let keyboard = null;
-
 let currentInput = null;
 
 let _bdayChangeHandler = null;
 let _ageInputHandler = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const select = document.getElementById("requestTypeSelect")
+  const container = document.getElementById("formContainer")
+
+  if (!select || !container) return
+
+  select.addEventListener("change", () => {
+    const id = select.value
+    if (!id) {
+      container.innerHTML = ""
+      container.style.display = "none"
+      return
+    }
+
+    container.style.display = "block"
+
+    fetch(`../api/get_request_fields.php?request_type_id=${id}`)
+      .then(r => r.json())
+      .then(f => renderDynamicKioskForm(f))
+  })
+})
+
 
 // --- Helper utilities (kept from your original) ---
 function randRef() {
@@ -526,107 +547,14 @@ const TEMPLATE_REGISTRY = {
 };
 
 /* =========================================================
-   SHOW KEYBOARD
-========================================================= */
-function isMobileOrTablet() {
-  return window.matchMedia('(max-width: 768px)').matches;
-}
-
-
-
-
-
-function showKeyboardForInput(input) {
-  if (isMobileOrTablet()) return;
-  if (!keyboard) return;
-
-  currentInput = input;
-  keyboard.style.display = 'block';
-  keyboard.setAttribute('aria-hidden', 'false');
-}
-
-function wireKeyboardKeys() {
-  const keys = keyboard.querySelectorAll('.key');
-
-  keys.forEach(key => {
-    key.addEventListener('mousedown', (e) => {
-      e.preventDefault();      // stop focus loss
-      e.stopPropagation();     // stop auto-hide
-
-      if (!currentInput) return;
-
-      const value = key.dataset.key;
-
-      if (value === 'Delete') {
-        currentInput.value = currentInput.value.slice(0, -1);
-      } else if (value === 'Space') {
-        currentInput.value += ' ';
-      } else {
-        currentInput.value += value;
-      }
-
-      currentInput.dispatchEvent(
-        new Event('input', { bubbles: true })
-      );
-    });
-  });
-}
-
-function hideKeyboard() {
-  if (!keyboard) return;
-
-  keyboard.style.display = 'none';
-  keyboard.setAttribute('aria-hidden', 'true');
-  currentInput = null;
-}
-
-
-function enableKeyboardAutoHide() {
-  document.addEventListener('mousedown', (e) => {
-    if (!keyboard || !currentInput) return;
-
-    const clickedInsideKeyboard = keyboard.contains(e.target);
-    const clickedInput = e.target === currentInput;
-
-    if (!clickedInsideKeyboard && !clickedInput) {
-      hideKeyboard();
-    }
-  });
-}
-
-
-
-function wireOnScreenKeyboard() {
-  if (isMobileOrTablet()) return;
-
-  const inputs = document.querySelectorAll(
-    '#formContainer input, #formContainer textarea'
-  );
-
-  inputs.forEach(input => {
-    input.addEventListener('focus', () => {
-      showKeyboardForInput(input);
-    });
-  });
-}
-
-
-/* =========================================================
    RENDER FORM BASED ON SELECT
 ========================================================= */
-console.log("Submitting request_type_id:",
-  document.getElementById("requestTypeSelect").value
-);
 function renderSelectedForm() {
   const requestTypeId = requestTypeSelect.value;
   if (!requestTypeId) return;
 
   fetch(`../api/get_request_fields.php?request_type_id=${requestTypeId}`)
-    .then(async res => {
-      const text = await res.text();
-      console.log("RAW RESPONSE:", text);
-      return JSON.parse(text);
-    })
+    .then(res => res.json())
     .then(fields => {
       if (!fields.length) {
         formContainer.innerHTML = '<p class="text-center">No fields configured.</p>';
@@ -640,10 +568,6 @@ function renderSelectedForm() {
       formContainer.innerHTML = '<p class="text-danger">Failed to load form.</p>';
     });
 }
-
-
-
-
 
 // ---------- Auto-age calculation from birthday ----------
 function computeAgeFromDOB(dobString) {
@@ -736,21 +660,8 @@ function wireAutoAge() {
   bday.addEventListener('input', _bdayChangeHandler);
   age.addEventListener('input', _ageInputHandler);
 }
-
-// format raw digits (10) into "xxx xxx xxxx"
-function formatPHNumber(digits) {
-  // remove non-digits just in case
-  const d = (digits || '').replace(/\D/g, '').slice(0, 10);
-  if (!d) return '';
-  if (d.length <= 3) return d;
-  if (d.length <= 6) return `${d.slice(0, 3)} ${d.slice(3)}`;
-  return `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}`;
-}
-
-
 // ---------- Form Behaviors (fixed) ----------
 let _globalDocClickHandler = null;
-let _keyboardKeyHandler = null;
 let _focusInHandler = null;
 let _focusOutHandler = null;
 
@@ -855,8 +766,6 @@ function validateAndConfirm(formEl) {
     return;
   }
 
-
-
   // ---------- CONFIRM MODAL ----------
 
 
@@ -867,7 +776,6 @@ function validateAndConfirm(formEl) {
   const modalEl = document.getElementById('confirmModal');
   const confirmModal = bootstrap.Modal.getOrCreateInstance(modalEl);
   console.log('✅ validation passed, showing confirm modal');
-  hideKeyboard();
   const confirmNo = modalEl.querySelector('#confirmNo');
   const confirmYes = modalEl.querySelector('#confirmYes');
   confirmModal.show();
@@ -882,18 +790,16 @@ function validateAndConfirm(formEl) {
 
   modalEl.querySelector('#confirmYes').addEventListener('click', () => {
     confirmModal.hide();
-    submitRequestToSQL();
+    showSummary(formEl);
   });
-
-
 }
 
 
 /* =========================================================
    SUMMARY + PRINT
 ========================================================= */
-function showSummary(formEl, refNumber) {
-  // const ref = randRef();
+function showSummary(formEl) {
+  const ref = randRef();
   const summaryBody = document.getElementById('summaryBody');
   const entries = {};
 
@@ -915,7 +821,7 @@ function showSummary(formEl, refNumber) {
 
   let html = `
     <p><strong>Request Type:</strong> ${selectedText}</p>
-    <p><strong>Reference Number:</strong> ${refNumber}</p>
+    <p><strong>Reference Number:</strong> ${ref}</p>
     <hr>
   `;
 
@@ -940,14 +846,16 @@ function showSummary(formEl, refNumber) {
     setTimeout(() => {
       document.getElementById('printingOverlay').style.display = 'none';
       summaryModal.hide();
+
+      // ✅ correct place
+      window.scannedData = null;
+
       window.location.href = '../index.html';
       formEl.reset();
     }, 3000);
   });
+
 }
-
-
-
 
 // ---------- startup ----------
 // requestTypeSelect.addEventListener('change', renderSelectedForm);
@@ -959,25 +867,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  keyboard = document.getElementById('keyboard');
-
-  if (!keyboard) {
-    console.error('❌ keyboard element not found');
-  }
-
-  keyboard.addEventListener('mousedown', (e) => {
-    e.stopPropagation();
-  });
-
-  wireKeyboardKeys();
-  enableKeyboardAutoHide();
-});
-
-// initial render
-
 
 document.addEventListener('DOMContentLoaded', () => {
   requestTypeSelect = document.getElementById('requestTypeSelect');
@@ -997,7 +886,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
 function renderDynamicKioskForm(fields) {
   const form = document.createElement("form");
   form.id = "activeForm";
@@ -1012,17 +900,16 @@ function renderDynamicKioskForm(fields) {
     label.textContent = f.label;
 
     let input;
-
-    // basic input types for kiosk
     if (f.field_type === "textarea") {
       input = document.createElement("textarea");
       input.rows = 3;
     } else {
       input = document.createElement("input");
-      input.type = f.field_type; // text, number, date
+      input.type = f.field_type;
     }
 
     input.name = f.field_key;
+    input.id = f.field_key; // ⭐ REQUIRED FOR AUTOFILL
     input.className = "form-control";
     input.autocomplete = "off";
 
@@ -1030,8 +917,7 @@ function renderDynamicKioskForm(fields) {
       input.required = true;
     }
 
-    group.appendChild(label);
-    group.appendChild(input);
+    group.append(label, input);
     form.appendChild(group);
   });
 
@@ -1039,15 +925,16 @@ function renderDynamicKioskForm(fields) {
   submitBtn.type = "submit";
   submitBtn.className = "btn btn-primary w-100 mt-3";
   submitBtn.textContent = "Submit Request";
-
   form.appendChild(submitBtn);
 
-  // render into kiosk
   formContainer.innerHTML = "";
   formContainer.appendChild(form);
-
-  // 🔥 reuse your existing, working logic
+  
   initFormBehaviors();
-  wireOnScreenKeyboard();
   initializeDatePickers();
+
+  // 🔥 auto-fill from scanned ID if available
+  if (window.applyAutofillIfAvailable) {
+    window.applyAutofillIfAvailable();
+  }
 }
