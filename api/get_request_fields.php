@@ -4,6 +4,7 @@ header('Content-Type: application/json');
 $conn = new mysqli("153.92.15.84","u279021732_brgyugong","Ds#XH1I#t","u279021732_brgyugong");
 
 // HOST, USERNAME, PASSWORD, DATABASE
+// HOST, USERNAME, PASSWORD, DATABASE
 
 $typeId = $_GET['request_type_id'] ?? 0;
 

@@ -842,6 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSelectedForm();
   }
 });
+// autofill.js
 
 function renderDynamicKioskForm(fields) {
   const form = document.createElement("form");
