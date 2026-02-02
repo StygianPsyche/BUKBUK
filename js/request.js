@@ -1,4 +1,12 @@
+// ✅ ADD THIS (language read) — very top of file
+const kioskLang = localStorage.getItem("kioskLanguage") || "en";
+
 document.addEventListener("DOMContentLoaded", function () {
+
+  // ✅ ADD THIS (apply language on load)
+  if (typeof kioskTranslations !== "undefined") {
+    applyRequestLanguage(kioskLang);
+  }
 
   const idModalEl = document.getElementById("idPromptModal");
   const idModal = new bootstrap.Modal(idModalEl);
@@ -25,7 +33,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   fetch("../api/request_types.php")
-
     .then(response => response.json())
     .then(data => {
       console.log("✅ Loaded request types:", data);
@@ -43,12 +50,9 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("❌ Failed to load request types", error);
     });
 
-
-
   select.addEventListener("change", () => {
     const requestTypeId = select.value;
 
-    // ❌ No request selected → hide form
     if (!requestTypeId) {
       formContainer.innerHTML = "";
       formContainer.style.display = "none";
@@ -56,9 +60,8 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // ✅ Request selected → show form
     formContainer.style.display = "block";
-    formContainer.innerHTML = ""; // clear previous form
+    formContainer.innerHTML = "";
 
     console.log("📌 Selected request type ID:", requestTypeId);
 
@@ -73,3 +76,30 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 });
+
+
+// ✅ ADD THIS (language application) — bottom of file
+function applyRequestLanguage(lang) {
+  const t = kioskTranslations[lang];
+  if (!t) return;
+
+  document.querySelector("h5.fw-bold").textContent = t.requestTypes;
+  document.getElementById("requestTypeSelect").options[0].textContent = t.selectRequest;
+  document.getElementById("backBtn").textContent = t.back;
+
+  document.querySelector("#confirmModal .modal-title").textContent = t.confirmTitle;
+  document.querySelector("#confirmModal .modal-body").textContent = t.confirmText;
+  document.getElementById("confirmYes").textContent = t.yes;
+  document.getElementById("confirmNo").textContent = t.no;
+
+  document.querySelector("#summaryModal .modal-title").textContent = t.submissionSummary;
+  document.getElementById("printReceiptBtn").textContent = t.print;
+
+  document.querySelector("#idPromptModal .modal-title").textContent = t.beforeContinue;
+  document.querySelector("#idPromptModal p").textContent = t.haveId;
+  document.getElementById("idYesBtn").textContent = t.yes;
+  document.getElementById("idNoBtn").textContent = t.no;
+
+  document.querySelector("#cameraModal .modal-title").textContent = t.scanId;
+  document.querySelector("#cameraModal .btn-secondary").textContent = t.cancel;
+}
