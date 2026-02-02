@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const idModalEl = document.getElementById("idPromptModal");
   const idModal = new bootstrap.Modal(idModalEl);
+// autofill.js
 
   // Show modal immediately on page load
   idModal.show();

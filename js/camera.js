@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     video.srcObject = stream
     await video.play()
   }
+// autofill.js
 
   function closeCamera() {
     if (!stream) return
