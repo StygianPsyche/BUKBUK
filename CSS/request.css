@@ -1,16 +1,9 @@
-/* =========================================
-   🌿 REQUEST PAGE — Gradient Background + Floating Shapes
-   Elderly-Friendly Version (1080x1920)
-   ========================================= */
-
-/* -------------------- Background -------------------- */
 body {
   margin: 0;
   font-family: "Poppins", sans-serif;
   background: linear-gradient(160deg, #2e8b57, #3cb371, #00b37a);
   color: #fff;
   min-height: 100vh;
-  flex-direction: column;
   text-align: left;
   overflow-y: auto;
   font-size: 2.2rem;
@@ -18,7 +11,6 @@ body {
   padding: 20px;
 }
 
-/* -------------------- Form Container -------------------- */
 #formContainer {
   max-height: calc(100vh - 250px);
   overflow-y: auto;
@@ -34,19 +26,6 @@ textarea {
   font-size: 1rem;
 }
 
-@media (max-width: 768px) {
-  input,
-  select,
-  textarea {
-    font-size: 1.1rem;
-  }
-
-  button {
-    font-size: 1.1rem;
-    padding: 0.75rem;
-  }
-}
-
 .formContainer {
   display: none;
 }
@@ -55,7 +34,6 @@ textarea {
   margin: auto;
 }
 
-/* -------------------- Floating Shapes -------------------- */
 .bg-patterns {
   position: fixed;
   inset: 0;
@@ -76,18 +54,17 @@ textarea {
   100% { transform: translateY(0) translateX(0) rotate(360deg); }
 }
 
-.shape:nth-child(1) { width: 80px; height: 80px; top: 10%; left: 15%; animation-duration: 12s; }
-.shape:nth-child(2) { width: 50px; height: 50px; top: 25%; left: 70%; animation-duration: 14s; }
-.shape:nth-child(3) { width: 100px; height: 100px; top: 50%; left: 40%; animation-duration: 16s; }
-.shape:nth-child(4) { width: 60px; height: 60px; top: 70%; left: 20%; animation-duration: 18s; }
-.shape:nth-child(5) { width: 40px; height: 40px; top: 15%; left: 80%; animation-duration: 20s; }
-.shape:nth-child(6) { width: 90px; height: 90px; top: 60%; left: 55%; animation-duration: 22s; }
-.shape:nth-child(7) { width: 70px; height: 70px; top: 30%; left: 30%; animation-duration: 24s; }
-.shape:nth-child(8) { width: 50px; height: 50px; top: 80%; left: 75%; animation-duration: 26s; }
-.shape:nth-child(9) { width: 60px; height: 60px; top: 45%; left: 85%; animation-duration: 28s; }
-.shape:nth-child(10){ width: 40px; height: 40px; top: 5%; left: 50%; animation-duration: 30s; }
+.shape:nth-child(1) { width: 80px; height: 80px; top: 10%; left: 15%; }
+.shape:nth-child(2) { width: 50px; height: 50px; top: 25%; left: 70%; }
+.shape:nth-child(3) { width: 100px; height: 100px; top: 50%; left: 40%; }
+.shape:nth-child(4) { width: 60px; height: 60px; top: 70%; left: 20%; }
+.shape:nth-child(5) { width: 40px; height: 40px; top: 15%; left: 80%; }
+.shape:nth-child(6) { width: 90px; height: 90px; top: 60%; left: 55%; }
+.shape:nth-child(7) { width: 70px; height: 70px; top: 30%; left: 30%; }
+.shape:nth-child(8) { width: 50px; height: 50px; top: 80%; left: 75%; }
+.shape:nth-child(9) { width: 60px; height: 60px; top: 45%; left: 85%; }
+.shape:nth-child(10) { width: 40px; height: 40px; top: 5%; left: 50%; }
 
-/* -------------------- Form & Inputs -------------------- */
 input.form-control,
 textarea.form-control {
   font-size: 25px;
@@ -95,116 +72,63 @@ textarea.form-control {
   height: 50px;
   width: 100%;
   border-radius: 8px;
-  text-align: left;
-}
-
-input[type="date"] {
-  width: 100%;
-  display: block;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 5px;
-  text-align: left;
-}
-
-.mb-3 {
-  margin-bottom: 1rem;
 }
 
 .form-select {
   font-size: 25px;
   padding: 12px;
-  text-align: left;
 }
 
-.form-select option {
+.container,
+.card {
   font-size: 25px;
-}
-
-/* -------------------- WHITE CARD FOR ID QUESTION -------------------- */
-.id-card {
-  background-color: #ffffff;
-  color: #212529;
-  border-radius: 12px;
-  font-size: 22px;
-}
-
-.id-card .form-label {
-  font-weight: bold;
-  font-size: 24px;
-}
-
-.id-card .form-check {
-  margin-right: 30px;
-  margin-top: 10px;
-}
-
-.id-card .form-check-input {
-  transform: scale(1.4);
-  margin-right: 8px;
-}
-
-.id-card .form-check-label {
-  font-size: 22px;
-  cursor: pointer;
-}
-
-/* -------------------- Containers & Cards -------------------- */
-.container {
-  font-size: 18px;
-  text-align: left;
 }
 
 h5 {
   font-size: 30px;
 }
 
-.card {
-  font-size: 25px;
-  text-align: left;
+#printingOverlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  z-index: 1080;
+  font-size: 1.1rem;
 }
 
-/* -------------------- Modal Styles -------------------- */
-.modal-content {
-  font-size: 18px;
-  font-family: Arial, sans-serif;
-  border-radius: 8px;
-  padding: 15px;
-  text-align: left;
+#idCameraSection {
+  display: none;
 }
 
-.modal-header {
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.modal-body {
-  font-size: 18px;
-  padding: 15px 20px;
-  line-height: 1.6;
-}
-
-.modal-footer {
+.camera-preview {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid rgba(0, 0, 0, 0.15);
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
 }
 
-.modal-footer .btn {
-  font-size: 18px;
-  padding: 10px 15px;
-  border-radius: 6px;
+.camera-preview video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-@media (max-width: 768px) {
-  .modal-dialog {
-    max-width: 100%;
-    margin: 10px;
-  }
+.scan-btn {
+  font-size: 1.2rem;
+  padding: 12px 20px;
+  font-weight: bold;
+  border-radius: 8px;
 }
 
-/* -------------------- Back Button -------------------- */
 #backBtn {
   background-color: #1bb9c2;
   border-color: #188ece;
@@ -213,29 +137,59 @@ h5 {
   font-size: 1.6rem;
   padding: 12px 30px;
   border-radius: 8px;
-  transition: all 0.2s ease-in-out;
 }
 
-#backBtn:hover {
-  background-color: #310ec0;
-  transform: scale(1.05);
+#idNoBtn {
+  color: #000;
+  border-color: #000;
+  background-color: #f8f9fa;
 }
+/* Floating shapes */
 
-/* -------------------- Bootstrap Modal Text Fix -------------------- */
 .modal,
 .modal-content {
-  color: #212529 !important;
+  color: #212529;
 }
 
-.modal-footer .btn {
-  color: #fff !important;
+.modal-footer {
+  display: flex;
+  gap: 12px;
 }
 
 .modal-footer .btn-secondary {
-  background-color: #6c757d !important;
+  flex: 1;
 }
 
-.modal-footer .btn-primary {
-  background-color: #0d6efd !important;
+.modal-footer .scan-btn {
+  flex: 2;
 }
 
+#accessibilityFab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1100;
+}
+
+#micToggleBtn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background-color: #0d6efd;
+  color: #fff;
+  font-size: 28px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+#micToggleBtn:active {
+  transform: scale(0.95);
+}
+
+#micToggleBtn:focus {
+  outline: none;
+}
