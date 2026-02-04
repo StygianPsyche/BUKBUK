@@ -1,3 +1,6 @@
+console.log("✅ request.js loaded");
+
+
 // ✅ ADD THIS (language read) — very top of file
 const kioskLang = localStorage.getItem("kioskLanguage") || "en";
 
@@ -10,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const idModalEl = document.getElementById("idPromptModal");
   const idModal = new bootstrap.Modal(idModalEl);
-// autofill.js
+  // autofill.js
 
   // Show modal immediately on page load
   idModal.show();
@@ -57,26 +60,202 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!requestTypeId) {
       formContainer.innerHTML = "";
       formContainer.style.display = "none";
-      console.log("🧹 No request selected, form hidden");
       return;
     }
 
     formContainer.style.display = "block";
-    formContainer.innerHTML = "";
-
-    console.log("📌 Selected request type ID:", requestTypeId);
 
     fetch(`../api/get_request_fields.php?request_type_id=${requestTypeId}`)
       .then(res => res.json())
-      .then(fields => {
-        console.log("📦 Fields for kiosk:", fields);
-        renderDynamicKioskForm(fields);
+      .then(data => {
+        console.log("📦 Request data:", data);
+
+        if (!data.request_sections?.length) {
+          console.error("❌ No request_sections");
+          return;
+        }
+
+        const templateKey = SECTION_TO_TEMPLATE[data.request_sections[0]];
+
+        formContainer.innerHTML = `
+          <form id="activeForm" novalidate>
+            ${FORM_TEMPLATES[templateKey]()}
+            <button type="submit" class="btn btn-primary w-100 mt-3">
+              Submit Request
+            </button>
+          </form>
+        `;
+
+        initFormBehaviors();
+        initializeDatePickers();
+
       })
-      .catch(err => {
-        console.error("❌ Failed to load fields", err);
-      });
+      .catch(err => console.error("❌ Fetch error:", err));
   });
+
 });
+
+
+/* =========================================================
+   FORM TEMPLATES
+========================================================= */
+const SECTION_TO_TEMPLATE = {
+  basic: "basic",
+  construction: "construction",
+  complaints: "complaint"
+};
+
+const FORM_TEMPLATES = {
+  /* ===============================
+     BASIC DETAILS TEMPLATE
+  =============================== */
+  basic() {
+    return `
+      <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="full_name" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Contact Number</label>
+        <input type="tel" name="contact_number" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Address</label>
+        <input type="text" name="address" class="form-control" required>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Birthdate</label>
+          <input type="date" name="birthdate" class="form-control" required>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Age</label>
+          <input type="number" name="age" class="form-control" readonly>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Civil Status</label>
+        <select name="civil_status" class="form-select" required>
+          <option value="">-- Select --</option>
+          <option>Single</option>
+          <option>Married</option>
+          <option>Widowed</option>
+          <option>Separated</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Length of Stay in Brgy. Ugong</label>
+        <input type="text" name="length_of_stay" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label d-block">Sex</label>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="sex" value="Male" required>
+          <label class="form-check-label">Male</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="sex" value="Female">
+          <label class="form-check-label">Female</label>
+        </div>
+      </div>
+    `;
+  },
+
+  /* ===============================
+     CONSTRUCTION TEMPLATE
+  =============================== */
+  construction() {
+    return `
+      <div class="mb-3">
+        <label class="form-label">Name of Owner</label>
+        <input type="text" name="owner_name" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Position</label>
+        <input type="text" name="position" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Type of Construction</label>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="construction_type" value="New" required>
+          <label class="form-check-label">New</label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="construction_type" value="Renovation">
+          <label class="form-check-label">Renovation</label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="construction_type" value="Demolition">
+          <label class="form-check-label">Demolition</label>
+        </div>
+
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="construction_type" value="Excavation">
+          <label class="form-check-label">Excavation</label>
+        </div>
+
+        <div class="form-check mt-2">
+          <input class="form-check-input" type="radio" name="construction_type" value="Others">
+          <label class="form-check-label">Others</label>
+        </div>
+
+        <input type="text"
+               name="construction_other"
+               class="form-control mt-2"
+               placeholder="Please specify (if Others)">
+      </div>
+    `;
+  },
+
+  /* ===============================
+     COMPLAINT TEMPLATE
+  =============================== */
+  complaint() {
+    return `
+      <div class="mb-3">
+        <label class="form-label">Respondent Name</label>
+        <input type="text" name="respondent_name" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Respondent Address</label>
+        <input type="text" name="respondent_address" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Type of Complaint</label>
+        <input type="text" name="complaint_type" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Complaint Body</label>
+        <textarea name="complaint_body"
+                  class="form-control"
+                  rows="4"
+                  required></textarea>
+      </div>
+    `;
+  }
+};
+
+
 
 
 // ✅ ADD THIS (language application) — bottom of file

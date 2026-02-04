@@ -1,3 +1,5 @@
+console.log("✅ script.js loaded");
+
 // ---------- Utils ----------
 let requestTypeSelect;
 let formContainer;
@@ -7,27 +9,27 @@ let currentInput = null;
 let _bdayChangeHandler = null;
 let _ageInputHandler = null;
 
-document.addEventListener("DOMContentLoaded", () => {
-  const select = document.getElementById("requestTypeSelect")
-  const container = document.getElementById("formContainer")
+// document.addEventListener("DOMContentLoaded", () => {
+//   const select = document.getElementById("requestTypeSelect")
+//   const container = document.getElementById("formContainer")
 
-  if (!select || !container) return
+//   if (!select || !container) return
 
-  select.addEventListener("change", () => {
-    const id = select.value
-    if (!id) {
-      container.innerHTML = ""
-      container.style.display = "none"
-      return
-    }
+//   select.addEventListener("change", () => {
+//     const id = select.value
+//     if (!id) {
+//       container.innerHTML = ""
+//       container.style.display = "none"
+//       return
+//     }
 
-    container.style.display = "block"
+//     container.style.display = "block"
 
-    fetch(`../api/get_request_fields.php?request_type_id=${id}`)
-      .then(r => r.json())
-      .then(f => renderDynamicKioskForm(f))
-  })
-})
+//     fetch(`../api/get_request_fields.php?request_type_id=${id}`)
+//       .then(r => r.json())
+//       .then(f => renderDynamicKioskForm(f))
+//   })
+// })
 
 
 // --- Helper utilities (kept from your original) ---
@@ -836,17 +838,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   console.log('✅ script.js connected on request page');
 
-  requestTypeSelect.addEventListener('change', renderSelectedForm);
+  // requestTypeSelect.addEventListener('change', renderSelectedForm);
 
   if (requestTypeSelect.value) {
     renderSelectedForm();
   }
 });
+
+
 // autofill.js
 
 function renderDynamicKioskForm(fields) {
-  const form = document.createElement("form");
-  form.id = "activeForm";
+  const form = document.getElementById("activeForm");
+  if (!form) return;
   form.noValidate = true;
 
   fields.forEach(f => {
@@ -887,7 +891,7 @@ function renderDynamicKioskForm(fields) {
 
   formContainer.innerHTML = "";
   formContainer.appendChild(form);
-  
+
   initFormBehaviors();
   initializeDatePickers();
 
