@@ -46,12 +46,33 @@ document.addEventListener("DOMContentLoaded", function () {
 function initializeDatePickers() {
   flatpickr("input[type='date']", {
     dateFormat: "m/d/Y",
-    allowInput: false,
-    disableMobile: true, // kiosk-safe
-    locale: "en",
     maxDate: "today",
+    disableMobile: true,
+
+    onChange: function (selectedDates, dateStr, instance) {
+      const input = instance.input;
+
+      // ✅ Only react if this is the birthday field
+      if (input.id !== "bday") return;
+
+      const ageInput = document.getElementById("age");
+      if (!ageInput || !selectedDates.length) return;
+
+      const birthDate = selectedDates[0];
+      const today = new Date();
+
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      ageInput.value = age;
+    }
   });
 }
+
 
 // Function to display a list of years
 function showYearDropdown(instance, yearElement) {
@@ -457,7 +478,10 @@ const TEMPLATE_REGISTRY = {
 ========================================================= */
 function renderSelectedForm() {
   const requestTypeId = requestTypeSelect.value;
-  if (!requestTypeId) return;
+  if (!requestTypeId) {
+    formContainer.innerHTML = ''; // optional: hide form
+    return;
+  }
 
   fetch(`../api/get_request_fields.php?request_type_id=${requestTypeId}`)
     .then(res => res.json())
@@ -467,13 +491,18 @@ function renderSelectedForm() {
         return;
       }
 
+      // 1️⃣ Render the form HTML
       renderDynamicKioskForm(fields);
+
+      initializeDatePickers(); // ← keeps flatpickr working
+      initFormBehaviors(); 
     })
     .catch(err => {
       console.error(err);
       formContainer.innerHTML = '<p class="text-danger">Failed to load form.</p>';
     });
 }
+
 
 // ---------- Auto-age calculation from birthday ----------
 function computeAgeFromDOB(dobString) {
@@ -497,27 +526,6 @@ function wireAutoAge() {
   const ageInput = document.getElementById("age");
 
   if (!bdayInput || !ageInput) return;
-
-  flatpickr(bdayInput, {
-    dateFormat: "m/d/Y",
-    maxDate: "today",
-    disableMobile: true,
-    onChange: function (selectedDates) {
-      if (!selectedDates.length) return;
-
-      const birthDate = selectedDates[0];
-      const today = new Date();
-
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const m = today.getMonth() - birthDate.getMonth();
-
-      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-
-      ageInput.value = age;
-    }
-  });
 }
 
 // ---------- Form Behaviors (fixed) ----------

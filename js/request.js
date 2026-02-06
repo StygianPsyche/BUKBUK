@@ -134,12 +134,12 @@ const FORM_TEMPLATES = {
       <div class="row">
         <div class="col-md-6 mb-3">
           <label class="form-label">Birthdate</label>
-          <input type="date" name="birthdate" class="form-control" required>
+          <input id="bday" type="date" name="birthdate" class="form-control" required>
         </div>
 
         <div class="col-md-6 mb-3">
           <label class="form-label">Age</label>
-          <input type="number" name="age" class="form-control" readonly>
+          <input id="age" type="number" name="age" class="form-control" readonly>
         </div>
       </div>
 
@@ -256,44 +256,6 @@ const FORM_TEMPLATES = {
 };
 
 
-function submitRequest(formEl) {
-  const fields = {};
-
-  Array.from(formEl.elements).forEach(el => {
-    if (!el.name || el.type === "submit") return;
-
-    if (el.type === "radio") {
-      if (el.checked) fields[el.name] = el.value;
-    } else {
-      fields[el.name] = el.value;
-    }
-  });
-
-  const payload = {
-    type_id: requestTypeSelect.value,
-    fields
-  };
-
-  fetch("../api/submit_request.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  })
-
-    .then(res => res.json())
-    .then(data => {
-      if (!data.success) {
-        alert(data.message);
-        return;
-      }
-
-      alert("Submitted! Reference: " + data.ref_number);
-      formEl.reset();
-    })
-    .catch(() => {
-      alert("Server error");
-    });
-}
 
 
 // ✅ ADD THIS (language application) — bottom of file
