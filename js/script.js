@@ -10,14 +10,16 @@ let _bdayChangeHandler = null;
 let _ageInputHandler = null;
 
 // --- Helper utilities (kept from your original) ---
-function randRef() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  const ts = d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
-  const rnd = Math.floor(1000 + Math.random() * 9000);
-  return `REF-${ts}-${rnd}`;
-}
+let currentRef = null;
 
+function randRef() {
+  if (currentRef) return currentRef;
+
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+  currentRef = array[0].toString(16).padStart(8, '0').toUpperCase();
+  return currentRef;
+}
 function toUpperHandler(e) {
   // transform caret-safe uppercase
   const start = e.target.selectionStart, end = e.target.selectionEnd;
