@@ -14,7 +14,14 @@ body {
   justify-content: center;
   align-items: center;
 }
-/* Floating shapes */
+
+#confirmDetails {
+  max-height: 50vh;
+  overflow-y: auto;
+  font-size: 0.95rem;
+}
+
+
 
 /* =========================================
    Floating Shapes Background
@@ -305,4 +312,27 @@ h1 {
   .idle-content h1 { font-size: 2.5rem; }
   .idle-content .welcome-text { font-size: 1.5rem; }
   .idle-content .logo { width: 160px; height: 160px; }
+}
+
+/* ===== Flatpickr kiosk-safe styling ===== */
+.flatpickr-calendar {
+  font-size: 14px;
+}
+
+.flatpickr-months {
+  font-size: 14px;
+}
+
+.flatpickr-current-month {
+  font-size: 14px;
+}
+
+.flatpickr-weekday {
+  font-size: 12px;
+}
+
+.flatpickr-day {
+  height: 38px;
+  line-height: 38px;
+  max-width: 38px;
 }
