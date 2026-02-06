@@ -547,15 +547,15 @@ function initFormBehaviors() {
   const formEl = document.getElementById('activeForm');
   if (!formEl) return;
 
-  // Remove old listeners safely
-  const cleanForm = formEl.cloneNode(true);
-  formEl.replaceWith(cleanForm);
+  // prevent duplicate submit handlers safely
+  formEl.onsubmit = null;
 
-  cleanForm.addEventListener('submit', (e) => {
+  formEl.addEventListener('submit', (e) => {
     e.preventDefault();
-    validateAndConfirm(cleanForm);
+    validateAndConfirm(formEl);
   });
 }
+
 
 /* =========================================================
    VALIDATION + CONFIRMATION
@@ -606,13 +606,17 @@ function validateAndConfirm(formEl) {
 
   // ---------- CONFIRM MODAL ----------
   const modalEl = document.getElementById('confirmModal');
-  const confirmModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  // const confirmModal = bootstrap.Modal.getOrCreateInstance(modalEl);
   console.log('✅ validation passed, showing confirm modal');
   const confirmNo = modalEl.querySelector('#confirmNo');
   const confirmYes = modalEl.querySelector('#confirmYes');
 
   window._pendingForm = formEl;
   populateConfirmDetails(formEl);
+
+  const confirmModal = new bootstrap.Modal(
+    document.getElementById("confirmModal")
+  );
 
   confirmModal.show();
 
@@ -632,34 +636,31 @@ function validateAndConfirm(formEl) {
   });
 }
 
-function populateConfirmDetails(formEl) {
+function populateConfirmDetails() {
+  const formEl = document.querySelector("#activeForm");
   const container = document.getElementById("confirmDetails");
-  if (!container) return;
+
+  if (!formEl || !container) {
+    console.error("❌ confirmDetails container not found");
+    return;
+  }
 
   let html = `<ul class="list-group list-group-flush">`;
 
   Array.from(formEl.elements).forEach(el => {
     if (!el.name || el.type === "submit") return;
+    if (el.type === "radio" && !el.checked) return;
 
-    let value = "";
-
-    if (el.type === "radio") {
-      if (!el.checked) return;
-      value = el.value;
-    } else {
-      value = el.value;
-    }
-
-    if (!value) value = "(blank)";
+    const value = el.value?.trim() || "(blank)";
 
     const label =
-      el.closest(".mb-3")?.querySelector("label")?.innerText ||
-      el.name.replace(/_/g, " ");
+      formEl.querySelector(`label[for="${el.id}"]`)?.innerText ||
+      el.name.replace(/_/g, " ").toUpperCase();
 
     html += `
-      <li class="list-group-item px-0">
-        <strong>${label}:</strong>
-        <span class="float-end">${value}</span>
+      <li class="list-group-item d-flex justify-content-between">
+        <strong>${label}</strong>
+        <span>${value}</span>
       </li>
     `;
   });
@@ -667,6 +668,8 @@ function populateConfirmDetails(formEl) {
   html += `</ul>`;
   container.innerHTML = html;
 }
+
+
 
 function submitRequest(formEl, showSummaryAfter = false) {
   const fields = {};

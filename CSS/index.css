@@ -14,7 +14,14 @@ body {
   justify-content: center;
   align-items: center;
 }
-/* Floating shapes */
+
+#confirmDetails {
+  max-height: 50vh;
+  overflow-y: auto;
+  font-size: 0.95rem;
+}
+
+
 
 /* =========================================
    Floating Shapes Background
