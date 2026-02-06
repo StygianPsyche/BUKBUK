@@ -306,3 +306,26 @@ h1 {
   .idle-content .welcome-text { font-size: 1.5rem; }
   .idle-content .logo { width: 160px; height: 160px; }
 }
+
+/* ===== Flatpickr kiosk-safe styling ===== */
+.flatpickr-calendar {
+  font-size: 14px;
+}
+
+.flatpickr-months {
+  font-size: 14px;
+}
+
+.flatpickr-current-month {
+  font-size: 14px;
+}
+
+.flatpickr-weekday {
+  font-size: 12px;
+}
+
+.flatpickr-day {
+  height: 38px;
+  line-height: 38px;
+  max-width: 38px;
+}
