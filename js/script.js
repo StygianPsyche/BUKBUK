@@ -733,6 +733,7 @@ function validateAndConfirm(formEl) {
 
   modalEl.querySelector('#confirmYes').addEventListener('click', () => {
     confirmModal.hide();
+    submitRequest(formEl)
     showSummary(formEl);
   });
 }
@@ -772,6 +773,41 @@ function populateConfirmDetails(formEl) {
   html += `</ul>`;
   container.innerHTML = html;
 }
+
+function submitRequest(formEl) {
+  const fields = {};
+
+  Array.from(formEl.elements).forEach(el => {
+    if (!el.name || el.type === "submit") return;
+
+    if (el.type === "radio") {
+      if (el.checked) fields[el.name] = el.value;
+    } else {
+      fields[el.name] = el.value;
+    }
+  });
+
+  const payload = {
+    type_id: requestTypeSelect.value,
+    fields
+  };
+
+  fetch("../api/submit_request.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.text())
+    .then(text => {
+      console.log("RAW RESPONSE:", text);
+      alert(text);
+    })
+    .catch(err => {
+      console.error(err);
+      alert("JS fetch error");
+    });
+}
+
 
 
 /* =========================================================
