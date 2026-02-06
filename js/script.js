@@ -12,14 +12,14 @@ let _ageInputHandler = null;
 // --- Helper utilities (kept from your original) ---
 let currentRef = null;
 
-function randRef() {
-  if (currentRef) return currentRef;
+// function randRef() {
+//   if (currentRef) return currentRef;
 
-  const array = new Uint32Array(1);
-  crypto.getRandomValues(array);
-  currentRef = array[0].toString(16).padStart(8, '0').toUpperCase();
-  return currentRef;
-}
+//   const array = new Uint32Array(1);
+//   crypto.getRandomValues(array);
+//   currentRef = array[0].toString(16).padStart(8, '0').toUpperCase();
+//   return currentRef;
+// }
 function toUpperHandler(e) {
   // transform caret-safe uppercase
   const start = e.target.selectionStart, end = e.target.selectionEnd;
@@ -733,7 +733,7 @@ function validateAndConfirm(formEl) {
 
   modalEl.querySelector('#confirmYes').addEventListener('click', () => {
     confirmModal.hide();
-    submitRequest(formEl)
+    submitRequest(formEl, true)
     showSummary(formEl);
   });
 }
@@ -774,7 +774,7 @@ function populateConfirmDetails(formEl) {
   container.innerHTML = html;
 }
 
-function submitRequest(formEl) {
+function submitRequest(formEl, showSummaryAfter = false) {
   const fields = {};
 
   Array.from(formEl.elements).forEach(el => {
@@ -797,24 +797,34 @@ function submitRequest(formEl) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   })
-    .then(res => res.text())
-    .then(text => {
-      console.log("RAW RESPONSE:", text);
-      alert(text);
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) {
+        alert(data.message || "Submission failed");
+        return;
+      }
+
+      if (showSummaryAfter) {
+        showSummary(formEl, data.ref_number);
+      }
+
+      formEl.reset();
     })
     .catch(err => {
       console.error(err);
-      alert("JS fetch error");
+      alert("Server error");
     });
 }
+
 
 
 
 /* =========================================================
    SUMMARY + PRINT
 ========================================================= */
-function showSummary(formEl) {
-  const ref = randRef();
+function showSummary(formEl, refNumber) {
+  // const ref = randRef();
+  const ref = refNumber;
   const summaryBody = document.getElementById('summaryBody');
   const entries = {};
 
