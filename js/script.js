@@ -495,7 +495,8 @@ function renderSelectedForm() {
       renderDynamicKioskForm(fields);
 
       initializeDatePickers(); // ← keeps flatpickr working
-      initFormBehaviors(); 
+      wireAutoAge();       // ← wire up bday -> age behavior
+      initFormBehaviors();
     })
     .catch(err => {
       console.error(err);
@@ -526,7 +527,13 @@ function wireAutoAge() {
   const ageInput = document.getElementById("age");
 
   if (!bdayInput || !ageInput) return;
+
+  bdayInput.addEventListener("change", () => {
+    const age = computeAgeFromDOB(bdayInput.value);
+    ageInput.value = age !== "" ? age : "";
+  });
 }
+
 
 // ---------- Form Behaviors (fixed) ----------
 let _globalDocClickHandler = null;
