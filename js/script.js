@@ -9,29 +9,6 @@ let currentInput = null;
 let _bdayChangeHandler = null;
 let _ageInputHandler = null;
 
-// document.addEventListener("DOMContentLoaded", () => {
-//   const select = document.getElementById("requestTypeSelect")
-//   const container = document.getElementById("formContainer")
-
-//   if (!select || !container) return
-
-//   select.addEventListener("change", () => {
-//     const id = select.value
-//     if (!id) {
-//       container.innerHTML = ""
-//       container.style.display = "none"
-//       return
-//     }
-
-//     container.style.display = "block"
-
-//     fetch(`../api/get_request_fields.php?request_type_id=${id}`)
-//       .then(r => r.json())
-//       .then(f => renderDynamicKioskForm(f))
-//   })
-// })
-
-
 // --- Helper utilities (kept from your original) ---
 function randRef() {
   const d = new Date();
@@ -737,7 +714,12 @@ function validateAndConfirm(formEl) {
   console.log('✅ validation passed, showing confirm modal');
   const confirmNo = modalEl.querySelector('#confirmNo');
   const confirmYes = modalEl.querySelector('#confirmYes');
+
+  window._pendingForm = formEl;
+  populateConfirmDetails(formEl);
+
   confirmModal.show();
+
 
   // remove old listeners
   confirmNo.replaceWith(confirmNo.cloneNode(true));
@@ -751,6 +733,42 @@ function validateAndConfirm(formEl) {
     confirmModal.hide();
     showSummary(formEl);
   });
+}
+
+function populateConfirmDetails(formEl) {
+  const container = document.getElementById("confirmDetails");
+  if (!container) return;
+
+  let html = `<ul class="list-group list-group-flush">`;
+
+  Array.from(formEl.elements).forEach(el => {
+    if (!el.name || el.type === "submit") return;
+
+    let value = "";
+
+    if (el.type === "radio") {
+      if (!el.checked) return;
+      value = el.value;
+    } else {
+      value = el.value;
+    }
+
+    if (!value) value = "(blank)";
+
+    const label =
+      el.closest(".mb-3")?.querySelector("label")?.innerText ||
+      el.name.replace(/_/g, " ");
+
+    html += `
+      <li class="list-group-item px-0">
+        <strong>${label}:</strong>
+        <span class="float-end">${value}</span>
+      </li>
+    `;
+  });
+
+  html += `</ul>`;
+  container.innerHTML = html;
 }
 
 
