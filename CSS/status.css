@@ -103,6 +103,17 @@
 }
 
 /* ==============================
+   STATUS TEXT (NEW)
+   ============================== */
+.status-page .status-text {
+  font-size: 2rem;        /* increase size */
+  font-weight: 700;       /* bold */
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+/* ==============================
    Input
    ============================== */
 .status-page #refInput {

@@ -106,10 +106,13 @@
           }
 
           infoBox.innerHTML = `
-            <h6>Status: ${data.status}</h6>
-            <p>Date Submitted: ${data.requested_at}</p>
-            <p>Last Updated: ${data.updated_at}</p>
-          `;
+  <div class="status-text">
+    Status: ${data.status.replace("_", " ").toUpperCase()}
+  </div>
+  <p>Date Submitted: ${data.requested_at}</p>
+  <p>Last Updated: ${data.updated_at}</p>
+`;
+
 
         } catch (err) {
           console.error(err);
